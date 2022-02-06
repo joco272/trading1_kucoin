@@ -67,7 +67,7 @@ class Analysis(object):
         self.SECONDARY_RESOLUTION = None
         self.use_smaller_resolution = False
 
-
+        # THE MOST RECENT SIGNAL, in the process of being evaluated
         # the index of the df row that changed the state to Buy or Sell
         self.signal_index = None
         # Signal type
@@ -76,6 +76,27 @@ class Analysis(object):
         self.signal_resolution = None
         # state of the analysis object: Idle (waiting for signal), Buy (waiting for), Sell (Waiting for)
         self.signal_validity = None # Valid, Invalid, Wait
+
+        # Last executed transaction
+        self.last_valid_signal = None # Buy, Sell. The last signal that prompted an execution
+        self.last_valid_signal_time = None
+        self.last_valid_signal_resolution = None
+        self.last_transaction = None # Buy, Sell. The last transaction, whether from valid signal or correction
+        self.last_transaction_timestamp = None # of the candle that triggered the last_transaction
+        self.last_transaction_resolution = None # of the candle that triggered the last_transaction
+        self.last_transaction_close = None  # of the candle that triggered the last_transaction
+        self.last_sd = None # standard dev (5 min resolution) of last transaction, whether from valid signal or correction
+        self.stoploss_limit = None
+
+        # instance variables for paper trading
+        self.init_transactions = pd.DataFrame(
+            {'time_ex': [self.date], 'timeline_ex': ['timeline_ex'], 'time_s': ['time_s'], 'timeline_s': ['timeline_s'],
+             'signal': ['signal'], 'c': ['c'], 'limit': ['limit'], 'stoploss': ['stoploss'],
+             'transaction': ['transaction'], 'balance': ['balance'], 'currency': ['currency']})
+        self.df_transactions = self.df_data.append(self.init_data, ignore_index=False)  # append dummy data as 1st row
+        self.df_transactions_path = 'D:/Dropbox/Trading/James/paper_trading'
+        self.paper_balance_amount = 1
+        self.paper_balance_currency = "ETH"
 
 
     def change_date_for_file(self, date):
@@ -166,6 +187,7 @@ class Analysis(object):
             self.analyze_signal_and_data(idx[0], idx[1])
         return
 
+    # Merges trade signals into one df
     def merge_action(self, df=None): #change name to "process signals"?
 
         def process_incoming_signals(df):
@@ -197,6 +219,7 @@ class Analysis(object):
 
         return
 
+    # this function is called by merge_action and merge_close. Needs to come before
     def analyze_signal_and_data(self, timestamp, resolution):
         # every candle and every action signal at any resolution should trigger this function
 
@@ -240,12 +263,14 @@ class Analysis(object):
                     self.df_trade_alerts.drop(sub_signal_indexes, inplace=True)
                     self.df_trade_alerts = self.df_trade_alerts.append(sub_signals_df)
                     self.df_trade_alerts.sort_index(inplace=True)
+                    sub_signals_complete = True # Added 1/30/22. Make sure I didn't mess up
                 else:
                     print('sub-signals are NOT complete:', sub_signals_df.shape[0])
                     # need to update code. Probably pass? Log to CSV?
             return sub_signals_complete  # end of inner function 'check_complete'
 
         def detect_signal(resolution, start = None):
+            # Helper function for use resolution functions. Helps not repeat code
             # Finished 12/13 18:23
             # Untested
             """
@@ -267,9 +292,6 @@ class Analysis(object):
                 check_sell = check_sell_1.iloc[-1]
             except KeyError:
                 # No sell signal
-            except:
-                # some other error. Need to log it
-                pass
                 try:  # IS there a BUY signal?
                     check_buy_1 = self.df_trade_alerts.loc[(slice(start_df, end_df), (resolution), (1), (0, 1), (0)), :]
                     check_buy = check_buy_1.iloc[-1]
@@ -294,7 +316,8 @@ class Analysis(object):
                 return signal, signal_time, signal_resolution
             return
 
-        def check_signal_validity(signal_time, resolution ):
+        def check_signal_validity(signal_time, resolution):
+            # Diagram: Check transaction execution
             # Finished 12/13 18:22
             # Untested
             """
@@ -311,7 +334,6 @@ class Analysis(object):
             index_list = check_transaction_df.index
             last_row = index_list[-1]
             signal_status = None
-
                 # Has the color of the candles (direction of close) changed only once?
                 # (1/2) Assign color to the candles
             for idx in index_list:
@@ -332,43 +354,50 @@ class Analysis(object):
                     last_row, 'lower1']:
                     # Diagram outcome 3
                     signal_status = 'Valid'
+                    self.signal_validity = signal_status
                     return signal_status
                 else:
                     # Diagram outcome 2
                     signal_status = 'Wait'
+                    self.signal_validity = signal_status
                     return signal_status
             else:
                 # Diagram outcome 1
                 self.buy_sell = 'None'
                 signal_status = 'Invalid'
+                self.signal_validity = signal_status
                 return signal_status
 
+        # The use primary and use secondary functions analyze signals and data and send the execution signal
         def use_primary_resolution(timestamp, resolution):
             self.df_trade_alerts.sort_index(inplace=True)
             index_list = self.df_trade_alerts.index
             start_sub = timestamp
             end_sub = index_list[-1][0]
+            transaction_execution = False
             signal = None
             sub_signal = None
             secondary_resolution = self.RESOLUTIONS[self.RESOLUTIONS.index(resolution)+1]
-            try: # to find signal data of the principal resolution
+            try: # Graph decision A2: Signal @ main resolution?
                 df_slice = self.df_trade_alerts.loc[(slice(start_sub, end_sub), resolution, (0, 1), (0, 1), (0, 1), (0, 1)), :]
-            except IndexError:
-                #no data of the correct resolution found
+            except IndexError: # A2 No
+                #no signal @ primary resolution found
                 pass
-            else:
-                # Graph decision A3
+            else: # A2 Yes, signal @ main resolution
+                # Graph decision A3: Sub-signal complete?
                 df_index_1 = df_slice.iloc[-1] # this results in a series, not a df
                 df_index = df_index_1.name # so we use .name instead of .index
                 sub_signals_complete = check_signals_complete(df_index)
-                if sub_signals_complete:
-                    # Graph decision A4: There is a BUY or SELL @ principal resolution
-                    signal, signal_time, signal_resolution = detect_signal(resolution) #return values should be: Buy, Sell, None
+                if sub_signals_complete: # Graph decision A4
+                    # Graph decision A4 Yes: There is a BUY or SELL @ principal resolution; sub-signals are complete
+                    signal, signal_time, signal_resolution = detect_signal(resolution) #return values for signal should be: Buy, Sell, None
                     # Above line returns the last (current or not) signal @ principal resolution
-                    if signal == 'Buy' or signal == 'Sell':
+                    if signal == 'Buy' or signal == 'Sell': #A4: What kind of signal is it??
                         self.signal = signal
                         self.signal_time = signal_time
                         self.signal_resolution = resolution
+                        self.use_smaller_resolution = False
+                        self.SECONDARY_RESOLUTION = None
                         # Graph decision A5: if matching sub-signal
                         sub_signal, sub_signal_time, sub_signal_resolution = detect_signal(secondary_resolution, signal_time)
                         if sub_signal == 'Buy' or sub_signal == 'Sell':
@@ -376,47 +405,58 @@ class Analysis(object):
                             sub_signal_validity = check_signal_validity(sub_signal_time, sub_signal_resolution)
                             if sub_signal_validity == 'Valid':
                                 # Execute transaction
+                                transaction_execution = True
+                                self.signal = sub_signal
+                                self.signal_time = sub_signal_time
+                                self.signal_resolution = sub_signal_resolution
+                                self.use_smaller_resolution = True
+                                self.SECONDARY_RESOLUTION = sub_signal_resolution
                                 pass
                             elif sub_signal_validity == 'Wait':
                                 # Wait @ secondary resolution
-                                self.SECONDARY_RESOLUTION = secondary_resolution
+                                self.signal = sub_signal
+                                self.signal_time = sub_signal_time
+                                self.signal_resolution = sub_signal_resolution
+                                self.use_smaller_resolution = True
+                                self.SECONDARY_RESOLUTION = sub_signal_resolution
                             elif sub_signal_validity == 'Invalid':
                                 # Wait @ Primary resolution
                                 self.SECONDARY_RESOLUTION = None
                                 self.use_smaller_resolution = False
-                        else: # A5 NO (No Signal @ secondary)
-                            self.use_smaller_resolution = False
-                            self.SECONDARY_RESOLUTION = None
-                    else: # A4 NO (No Signal @ Primary)
-                        # Check for the validity of last signal @ principal resolution
-                        signal_validity = check_signal_validity(signal_time, signal_resolution)
-                        if signal_validity == 'Valid':
-                            # Execute transaction
-                            pass
-                        elif signal_validity == 'Wait':
-                            # Wait @ principal resolution
-                            self.SECONDARY_RESOLUTION = None
-                            self.use_smaller_resolution = False
-                        elif signal_validity == 'Invalid':
-                            # invalidate signal
-                            self.SECONDARY_RESOLUTION = None
-                            self.use_smaller_resolution = False
-                            self.signal = None
-                            self.signal_validity = None
-                            self.signal_time = None
-                            self.signal_resolution = None
-                            self.signal_index = None
+                        else: # A5 NO (No sub-signal @ secondary)
+                            # Check for the validity of last signal @ principal resolution
+                            signal_validity = check_signal_validity(signal_time, signal_resolution)
+                            if signal_validity == 'Valid':
+                                # Execute transaction
+                                transaction_execution = True
+                                pass
+                            elif signal_validity == 'Wait':
+                                # Wait @ principal resolution
+                                self.SECONDARY_RESOLUTION = None
+                                self.use_smaller_resolution = False
+                            elif signal_validity == 'Invalid':
+                                # invalidate signal
+                                self.SECONDARY_RESOLUTION = None
+                                self.use_smaller_resolution = False
+                                self.signal = None
+                                self.signal_validity = None
+                                self.signal_time = None
+                                self.signal_resolution = None
+                                self.signal_index = None
+                    else: # A4 NO (No Signal in current candle @ Primary)
+                        # End
+                        pass
                 else: # A3 NO (Sub-signals not complete)
                     # End
                     pass
-                #What does this function need to return?
-            return
+            return transaction_execution
 
         def use_secondary_resolution(timestamp, resolution):
             self.df_trade_alerts.sort_index(inplace=True)
             index_list = self.df_trade_alerts.index
             start_sub = timestamp
             end_sub = index_list[-1][0]
+            transaction_execution = False
 
             try: # to find signal data of the secondary resolution
                 df_slice = self.df_trade_alerts.loc[(slice(start_sub, end_sub), resolution, (0, 1), (0, 1), (0, 1), (0, 1)), :]
@@ -425,7 +465,7 @@ class Analysis(object):
                 pass
             else:
                 # Graph decision B4: There is a BUY or SELL @ secondary resolution
-                signal, signal_time, signal_resolution = detect_signal(resolution)  # return values should be: Buy, Sell, Wait
+                signal, signal_time, signal_resolution = detect_signal(resolution)  # return values for signal should be: Buy, Sell, None
                 if signal == 'Buy' or signal == 'Sell':
                     self.signal = signal
                     self.signal_time = signal_time
@@ -437,7 +477,7 @@ class Analysis(object):
                     signal_validity = check_signal_validity(signal_time, resolution)
                     if signal_validity == 'Valid':
                         # Execute transaction
-                        pass
+                        transaction_execution = True
                     elif signal_validity == 'Wait':
                         # No need to do anything
                         pass
@@ -453,10 +493,19 @@ class Analysis(object):
                         self.signal_time = None
                         self.signal_resolution = None
                         self.signal_validity = None
-            return
+            return transaction_execution
 
         # Access to inner functions
         resolution_to_use = self.PRIMARY_RESOLUTION
+        execution_time = timestamp
+        execution_resolution = resolution
+        execution = None
+
+        # Set the variable to False so a stoploss check will execute
+        # it is before the Try Except so in case the @1m resolution is being used and
+        # a transaction execution results, then the var will change  from False to True and the stoploss will not execute
+        if timestamp[0].minute % 5 != 0: #not @ 15 or 5 minute resolution
+            execution = False
 
         try:
             signal_df_slice = self.df_trade_alerts.loc[(slice(timestamp, timestamp)), resolution, (0, 1), (0, 1), (0, 1), (0, 1)]
@@ -476,12 +525,238 @@ class Analysis(object):
                 if self.SECONDARY_RESOLUTION is not None:
                     resolution_to_use = self.SECONDARY_RESOLUTION
                     if resolution == resolution_to_use:
-                        use_secondary_resolution(timestamp, resolution_to_use)
+                        execution = use_secondary_resolution(timestamp, resolution_to_use)
                 else:
                     if resolution == resolution_to_use:
-                        use_primary_resolution(timestamp, resolution_to_use)
+                        execution = use_primary_resolution(timestamp, resolution_to_use)
 
+        if execution is not None:
+            self.check_transaction_execution(execution_time, execution_resolution, execution)
         return
+
+    # Incomplete. Work in progress 2/5/22
+    # Called by analyze_signal_and_data
+    def check_transaction_execution(self, execution_time, execution_resolution, transaction_execution):
+        timestamp = execution_time
+        resolution = execution_resolution
+        # executes a regular trade or a correction transaction
+        # Pending 2/5/22: code to send transaction
+        def execute_transaction(transaction_execution, stoploss):
+            # (1/2) Data recording and changes to instance variables
+            # returns the values of SD and close to use in either stoploss or transaction
+            execution_candle = self.df_data.loc[(slice(timestamp, timestamp)), resolution]
+            close = execution_candle[3]
+            mins = execution_candle.name[0].minutes
+            extra_mins = mins % 15
+            sd = 0.0
+            if extra_mins % 5 != 0:
+                new_ts = execution_candle.name[0] - timedelta(minutes=extra_mins)
+                series_for_sd = self.df_data.loc[(slice(new_ts, new_ts)), 5]
+                sd = series_for_sd[11]
+            elif extra_mins % 5 == 0:
+                sd = execution_candle[11]
+            elif extra_mins == 0:
+                new_ts = execution_candle.name[0] + timedelta(minutes=extra_mins)
+                series_for_sd = self.df_data.loc[(slice(new_ts, new_ts)), 5]
+                sd = series_for_sd[11]
+            # Record data for all transactions
+            # Instance Variables to update with any transaction; regular or stoploss
+            self.last_sd = sd
+            self.last_transaction_close = close  # last transaction price, whether from valid signal or correction
+            self.last_transaction_resolution = execution_resolution
+            self.last_transaction_timestamp = execution_time
+            # Sets the value for a stoploss; if regular transaction, value will be changed in "if transaction_execution:"
+            if self.last_transaction is not None:
+                if self.last_transaction == "BUY":
+                    self.last_transaction = "SELL"  # Buy, Sell. The last transaction, whether from valid signal or correction
+                elif self.last_transaction == "SELL" :
+                    self.last_transaction = "BUY"
+            # record data exclusive to regular transactions
+            if transaction_execution:
+                # There is a transaction to execute
+                # Instance Variables to update with regular transaction only
+                # if it's a regular transaction, the it will be the same as signal
+                self.last_transaction = self.signal
+                # change last valid signal to current signal
+                self.last_valid_signal = self.signal  # Buy, Sell. The last signal that prompted an execution
+                self.last_valid_signal_resolution = self.signal_resolution
+                self.last_valid_signal_time = self.signal_time
+                # Instance variables about the current signal that is being evaluated need to be reset to 'no signal'
+                self.signal_index = None
+                self.signal = None  # Buy, Sell
+                self.signal_time = None
+                self.signal_resolution = None
+                self.signal_validity = None  # Valid, Invalid, Wait
+                self.SECONDARY_RESOLUTION = None
+                self.use_smaller_resolution = False
+            # Set new stoploss
+            set_stoploss_limit()
+            # (2/2) Process transaction
+
+            # Code goes here to send transaction to module that processes with exchange
+
+            # Record paper trade
+            paper_trade()
+            return
+
+        def paper_trade():
+            COMMISSION = 0.0008
+            current_balance = self.paper_balance_amount
+            current_currency = self.paper_balance_currency
+            c = self.last_transaction_close
+            new_balance = 0.0
+            new_currency = None
+
+            if current_currency == "ETH":
+                new_balance = current_balance*c*(1-COMMISSION)
+                new_currency = "USDT"
+            else: #currency is USDT
+                new_balance = (current_balance/c)*(1-COMMISSION)
+                new_currency = "ETH"
+
+            # update the paper trade instance variables
+            self.paper_balance_amount = new_balance
+            self.paper_balance_currency = new_currency
+
+            # transaction information to record
+            time_ex = execution_time
+            timeline_ex = execution_resolution
+            time_s = self.last_valid_signal_time
+            timeline_s = self.last_valid_signal_resolution
+            signal = self.last_valid_signal
+            c = self.last_transaction_close
+            limit = self.stoploss_limit
+            stop_loss = stoploss
+            trans = transaction_execution
+            balance = self.paper_balance_amount
+            currency = self.paper_balance_currency
+
+            append = {"time_ex": [time_ex], "timeline_ex": [timeline_ex], "time_s": [time_s], "timeline_s": [timeline_s],
+                      "signal": [signal], "c": [c], "limit": [limit], "stoploss": [stop_loss], "transaction": [trans],
+                      "balance": [balance], "currency": [currency]}
+            df_append = pd.DataFrame.from_dict(append)
+            self.df_transactions = self.df_data.append(df_append, ignore_index=False)
+
+            csv_data = self.df_data_path + '/' + self.date_for_file + 'transactions.csv'
+            self.df_data.to_csv(csv_data, index=True, mode='a', header=False)
+
+
+        # decides whether a  stoploss is needed or not
+        # Finished 2/4/2021
+        def analyze_stoploss():
+            stoploss = False
+            minutes = timestamp[0].minute
+            limit = self.stoploss_limit
+            transaction = self.last_transaction
+            last_price = self.last_transaction_close
+
+            # 1 1m candle that goes past 2x limit will trigger stoploss
+            def check_1_min():
+                try:
+                    # slice to find data with the timestamp, resolution
+                    data_df_slice = self.df_data.loc[(slice(timestamp, timestamp)), resolution]
+                except IndexError:
+                    # No data of the timestamp, resolution; nothing happens
+                    pass
+                else:
+                    # There is data, retrieve the price close
+                    close = data_df_slice[3]
+                    if transaction == "BUY":
+                        if close < last_price - (limit*2):
+                            stoploss = True
+                            # execute stoploss
+                    else: #transaction == "SELL"
+                        if close > last_price + (limit*2):
+                            stoploss = True
+                            # execute stoploss
+                return stoploss
+
+            # 3 5m candles closing under or over limit will trigger stoploss
+            def check_5_min():
+                start = None
+                extra_min = minutes % 5
+
+                # If the previous transaction was a stoploss triggered @1m (5:26), then this sets the start time
+                # at 5:25 so that the 5m candle can be taken into account
+                if extra_min != 0:
+                    start =timestamp - timedelta(minutes=extra_min)
+                else:
+                    start = self.last_transaction_timestamp
+
+                end = timestamp
+                check_stoploss_df = self.df_data.loc[(slice(start, end), 5), :]
+                index_list = check_stoploss_df.index
+                candle_colors = []
+                candle_past_limit = []
+                result_list = []
+
+                # Assign color to the candles
+                for idx in index_list:
+                    if self.df_data.loc[idx, 'c'] > self.df_data.loc[idx, 'o']:
+                        candle_colors.append('green')
+                    else:
+                        candle_colors.append('red')
+                    # Assign positive value c > limit; negative otherwise
+                    if self.df_data.loc[idx, 'c'] > limit:
+                        candle_past_limit.append(1)
+                    else:
+                        candle_past_limit.append(-1)
+
+                # combine red and neg; green and pos; record results in list
+                if self.last_transaction == "BUY":
+                    for i in range (len(candle_colors)):
+                        if candle_colors[i] == 'red' and candle_past_limit[i] == -1:
+                            result_list.append(1)
+                        else:
+                            result_list.append(0)
+                else:
+                    for i in range (len(candle_colors)):
+                        if candle_colors[i] == 'green' and candle_past_limit[i] == 1:
+                            result_list.append(1)
+                        else:
+                            result_list.append(0)
+
+                if result_list.count(1) > 2:
+                    stoploss = True
+                    return(stoploss)
+                    # execute stoploss
+
+            # 1  min check needs to run every minute
+            stoploss = check_1_min()
+            # if the above does not trigger, check the 5m
+            if minutes % 5 == 0 and not stoploss:
+                temp_stoploss = check_5_min()
+                if temp_stoploss:
+                    stoploss = temp_stoploss
+            return stoploss
+
+        # transaction_close is the close of the candle that executed the transaction
+        # Finished 2/4/2021
+        def set_stoploss_limit(sd):
+            pct_limit = 0.0025  # This number is not in percentage points (0.0025 = 0.25%)
+            sd_limit = 0.25  # As a percent of SD. Same as above (0.25 = 25%)
+            price = self.last_transaction_close
+
+            limit_pct = price * pct_limit
+            limit_sd = price * sd
+
+            limit = limit_pct if limit_pct > limit_sd else limit_sd
+            self.stoploss_limit = limit
+            return
+
+        # executes a transaction or a stoploss check
+        # Finished 2/4/2021
+        if not transaction_execution:
+            stoploss = analyze_stoploss()
+            execute_transaction(transaction_execution, stoploss)
+        else:
+            execute_transaction(transaction_execution, False)
+        return
+
+
+
+
+
 
 
 

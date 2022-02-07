@@ -119,40 +119,25 @@ def dataPostJsonHandler():
 @app.route('/dt', methods=['POST'])
 def opPostJsonHandler():
     content = request.get_json()
-
     # print('request type:', type(request.data))
     # print('request data:', request.data)
-
     if content['type'] == 'data':
-        if content['title'] == 'open':
-            sample = dataOpenOutPath+'1_open_sample.json'
-            openFile = getTime('open')
+        if content['title'] == 'all':
+            sample = dataOutPath+'1_all_sample.json'
+            openFile = getTime('all')
             if validateData(sample, content):
-                with open(dataOpenOutPath + openFile + '.json', 'w') as outfile:
+                with open(dataOutPath + openFile + '.json', 'w') as outfile:
                     json.dump(content, outfile)
                 print('Successful validation:', content)
                 Thread(target=WebHookProcessor().process_webhook_data, args=[content, analysis]).start()
             else:
-                with open(dataOpenOutPath + openFile + '_bad_.json', 'w') as outfile:
-                    json.dump(content, outfile)
-                print('Message not validated', content)
-        elif content['title'] == 'close':
-            sample = dataCloseOutPath+'1_close_sample.json'
-            closeFile = getTime('close')
-            if validateData(sample, content):
-                Thread(target=WebHookProcessor().process_webhook_data, args=[content, analysis]).start()
-                print('Successful validation:', content)
-                with open(dataCloseOutPath + closeFile + '.json', 'w') as outfile:
-                    json.dump(content, outfile)
-            else:
-                with open(dataCloseOutPath + closeFile + '_bad_.json', 'w') as outfile:
+                with open(dataOutPath + openFile + '_bad_.json', 'w') as outfile:
                     json.dump(content, outfile)
                 print('Message not validated', content)
         else:
-            print('Message headers not valid', content)
+            print('Message content title not valid', content)
     else:
-        print('Message headers not valid', content)
-
+        print('Message content type not valid', content)
     return Response(status=200)
 
 #NOT USED

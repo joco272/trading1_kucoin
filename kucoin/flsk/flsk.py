@@ -186,6 +186,7 @@ def run_flsk(analysis_ob):
     analysis = analysis_ob
     sleep(1)
     app.run(host='192.168.0.118', port=80)
+    print('FLASK IS RUNNING!!!!!')
     return
 
 """if __name__ == '__main__':

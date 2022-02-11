@@ -76,6 +76,7 @@ class Analysis(object):
         self.last_sd = None  # standard dev (5 min resolution) of last transaction, whether from valid signal or correction
         self.stoploss_limit = None
 
+
         # instance variables for paper trading
         self.init_transactions = pd.DataFrame(
             {'time_ex': [self.date], 'timeline_ex': ['timeline_ex'], 'time_s': ['time_s'], 'timeline_s': ['timeline_s'],

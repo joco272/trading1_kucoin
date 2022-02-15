@@ -3,6 +3,7 @@ from kucoin.web_socket.web_socket import WebSocket
 from kucoin.timer.timer import Timer
 from kucoin.analysis.analysis import Analysis
 from kucoin.flsk import flsk
+from kucoin.read_historical_data import read_historical_data
 from multiprocessing import Process
 
 analysis = Analysis('use')
@@ -18,7 +19,7 @@ def printName():
 
 if __name__ == "kucoin.daemon.daemon":
 
-    print('Running Daemon: ', __name__)
+    print('\nRunning Daemon: ', __name__)
     t1 = Thread(target=runTimer)
     # t1.setDaemon(True)
     t1.start()
@@ -51,6 +52,8 @@ if __name__ == "__main__":
     t2 = Process(target=WebSocket(analysis).start_ws)
     # t2.setDaemon(True)
 
+    t = Thread(target=read_historical_data.read_historical_data(analysis))
+    t.start()
 
     t1.start()
     t3.start()

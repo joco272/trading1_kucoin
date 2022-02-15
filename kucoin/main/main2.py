@@ -7,11 +7,15 @@ from kucoin.user.user import UserData
 from kucoin.trade.trade import TradeData
 from kucoin.clients.kuCoin_client import KuCoinSpotClient as SpotClient
 from kucoin.analysis.analysis import Analysis
+from kucoin.read_historical_data import read_historical_data
 import kucoin.daemon as start_daemon
 from kucoin.web_socket.web_socket import WebSocket
 
 # Analysis object must be initialized first> It needs to be persistent. It will contain the live df's)
 analysis = Analysis() #=========================================================================================================
+# reader = read_historical_data.read_historical_data(analysis)
+t = Thread(target=read_historical_data.read_historical_data(analysis))
+t.start()
 
 
 logger = logging.getLogger()

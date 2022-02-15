@@ -65,6 +65,19 @@ class Analysis(object):
         # state of the analysis object: Idle (waiting for signal), Buy (waiting for), Sell (Waiting for)
         self.signal_validity = None  # Valid, Invalid, Wait
 
+        # Signals Data Frame stores signals and their state.
+        # Possibles states for the signals are: waiting, invalid (did not meet execution criteria), valid (executed)
+        # If the df is empty, signal search will start @ 1st row of df_all_data
+        # If df.shape[0] != 0 and there are 1 or more wait signals:
+        #   (1) check_signal_validity() and detect_signal() will use newest wait signal as the starting point:
+        #       (A) IF 2 signals have same time, use smallest resolution
+        #   (2) IF no wait signal, detect_signal() will use the newest of:
+        #       (A) 'valid' (last executed signal) or
+        #       (B) 'invalid'
+        self.signals_var = {'time': str(), 'timeline': float(), 's1': int(), 's2': int(), 'b1': int(), 'b2': int(),
+                            'nt': int(), 'state': str()}
+        self.df_signals = pd.DataFrame(columns=self.signals_var, index=['time', 'timeline', 's1', 's2', 'b1', 'b2', 'nt', 'state'])
+
         # Last executed transaction
         self.last_valid_signal = None  # Buy, Sell. The last signal that prompted an execution
         self.last_valid_signal_time = None
@@ -83,8 +96,16 @@ class Analysis(object):
              'transaction': ['transaction'], 'balance': ['balance'], 'currency': ['currency']})
         self.df_transactions = self.init_transactions.append(self.init_transactions, ignore_index=False)  # append dummy data as 1st row
         self.df_transactions_path = 'D:/Dropbox/Trading/James/paper_trading'
-        self.paper_balance_amount = 1
-        self.paper_balance_currency = "ETH"
+        #  1/23/22 @ 23:45Z: Sell1; 1/24/22 @ 00:00Z execute @ 15m, close = $2,516.17
+        #  comission 0.01% -20% for paying with Kucoin token = 0.008%
+        # starting balance = $2,516.17 (1 ETH eq) - 0.008% = $2,514.16 USDT
+        self.paper_balance_amount = 2514.16
+        self.paper_balance_currency = "USDT"
+
+        # set headers for csv files
+        csv_data_all = self.df_data_all_path + '/' + self.date_for_file + '_data_all.csv'
+        self.df_data_all.to_csv(csv_data_all, index=True, mode='a', header=True)
+        self.df_data_all = self.df_data_all[:0]
 
     def change_date_for_file(self, date):
         self.date_for_file = date
@@ -115,25 +136,25 @@ class Analysis(object):
     # No merge necessary
     def merge_data_all(self, df):
         # ===================================Display and print======================================
-        pd.set_option('display.max_columns', None)
+        # pd.set_option('display.max_columns', None)
         # pd.set_option("expand_frame_repr", False)
-        print(f'{self.time} merge_close function called with', df)
+        # print(f'{self.time} merge_close function called with', df)
         # df = df.set_index(['time'])
-        self.df_data_all = self.df_data_all.append(df, ignore_index=False)
-        print(f'{self.time} Close-df appended-size is:', self.df_data_all.shape[0], '\n', self.df_data_all)
-        csv_data_all = self.df_data_all_path + '/' + self.date_for_file + 'data_all.csv'
-        self.df_data_all.to_csv(csv_data_all, index=True, mode='a', header=False)
+        # self.df_data_all = self.df_data_all.append(df, ignore_index=False)
+        # print(f'{self.time} Close-df appended-size is:', self.df_data_all.shape[0], '\n', self.df_data_all)
+        # csv_data_all = self.df_data_all_path + '/' + self.date_for_file + 'data_all.csv'
+        # self.df_data_all.to_csv(csv_data_all, index=True, mode='a', header=False)
         # ===================================Start new Merge method======================================
 
         df = df.set_index(['time', 'timeline', 's1', 's2', 'b1', 'b2', 'nt'])
-
+        # print(f'DF from reader to append is {df}')
         self.df_data_all = self.df_data_all.append(df)
-        csv_data = self.df_data_all_path + '/' + self.date_for_file + '_data_all.csv'
-        self.df_data_all.to_csv(csv_data, index=True, mode='a', header=False)
+        csv_data_all = self.df_data_all_path + '/' + self.date_for_file + '_data_all.csv'
+        self.df_data_all.to_csv(csv_data_all, index=True, mode='a', header=False)
 
         if self.df_data_all.shape[0] > self.MAX_SIZE_df_data_all:
-            self.df_data = self.df_data_all[self.df_data_all.shape[0] - self.MAX_SIZE_df_data_all:]
-        print(f'{self.time} data_all merge finished-DATA_ALL size is:', self.df_data.shape[0], '\n', self.df_data)
+            self.df_data_all = self.df_data_all[self.df_data_all.shape[0] - self.MAX_SIZE_df_data_all:]
+        # print(f'{self.time} data_all merge finished-DATA_ALL size is:', self.df_data_all.shape[0], '\n', self.df_data_all)
 
         index_list = df.index
         for idx in index_list:
@@ -145,17 +166,34 @@ class Analysis(object):
         # every candle and every action signal at any resolution should trigger this function
 
         # 2/7/22: Updated for simpler signals handling
-        def check_signals_complete(df_index):  # Check that sub-signals are complete.
+        def check_signals_complete(df_index, resolution):  # Check that sub-signals are complete.
             # takes the index as an argument to check if all subsignals have been received
-            sub_signals_complete = False
 
-            start_sub = df_index[0]
-            check_complete_tl = df_index[1]
-            end_sub = start_sub + timedelta(minutes=check_complete_tl - 1)
+            sub_signals_complete = False
+            # start_sub = df_index[0]
+            check_complete_tl = resolution #  df_index[1]
+            minutes = idx[0].minute
+
+            # Obtain the start time of the candle @ main resolution
+            start_delta = minutes % resolution
+            if not isinstance(start_delta, int):
+                start_delta = start_delta.item()
+            #print(f'start_delta: {start_delta} is of type:', type(start_delta))
+            #print(idx[0])
+            start_sub = idx[0] - timedelta(minutes=start_delta)
+            end_delta = (minutes-start_delta)+(resolution-1)  # (start) + (resolution-1) eg: 30 + 14
+            if not isinstance(end_delta, int):
+                end_delta = end_delta.item()
+            end_sub = start_sub + timedelta(minutes=end_delta)
+
+            # end_sub = start_sub + timedelta(minutes=check_complete_tl - 1)
             if check_complete_tl != self.RESOLUTIONS[-1]:  # does idx have the smallest resolution?
                 # if it is the smallest resolution then there are no sub-signals
-                sub_signal_res = self.RESOLUTIONS[self.RESOLUTIONS.index(check_complete_tl) + 1]
+                # sub_signal_res = self.RESOLUTIONS[self.RESOLUTIONS.index(check_complete_tl) + 1]
                 resolutions_to_use = self.RESOLUTIONS[self.RESOLUTIONS.index(check_complete_tl):]
+                sub_signals_df_shape = 0
+                for resolution_to_use in resolutions_to_use:
+                    sub_signals_df_shape += check_complete_tl / resolution_to_use
                 try:
                     sub_signals_df = self.df_data_all.loc[
                                      (slice(start_sub, end_sub), resolutions_to_use, (0, 1), (0, 1), (0, 1), (0, 1),
@@ -165,36 +203,43 @@ class Analysis(object):
                     # print(f'no sub-signals found for {df_index}')
                     # need to update code. Probably pass? Log to CSV?
                 else:
-                    sub_signals_df_shape = 0
-                    for resolution_to_use in resolutions_to_use:
-                        sub_signals_df_shape += resolutions_to_use[0] / resolution_to_use
+                    # sub_signals_df_shape = 0
+                    # for resolution_to_use in resolutions_to_use:
+                        # sub_signals_df_shape += resolutions_to_use[0] / resolution_to_use
+                    # print(f'Actual Shape:', sub_signals_df.shape[0], 'should be:', sub_signals_df_shape)
+                    # print (f'===========sub-signals df========\n{sub_signals_df}')
                     if sub_signals_df.shape[0] == sub_signals_df_shape:  # sub-signals are complete
-                        print('sub-signals are complete:', sub_signals_df.shape[0])
                         sub_signals_complete = True  # Added 1/30/22. Make sure I didn't mess up
+                        # print(f'================sub-signals complete==============\n{sub_signals_df}')
             return sub_signals_complete  # end of inner function 'check_complete'
 
         # 2/7/22: Updated for simpler signals handling; now detects buy2 and sell2
         def detect_signal(resolution, start=None):
             # Helper function for use resolution functions. Helps not repeat code
-            # Finished 12/13 18:23
-            # Untested
-            """
-            What return values should be used??????
-            """
+
             signal_index = None
             signal = None
-
             start_df = None
             end_df = None
 
             # By default assume principal resolution is in use
-            start_df = self.df_data_all.iloc[0, 0]
-            end_df = self.df_data_all.iloc[-1, 0]
+            start_df = self.df_data_all.iloc[0].name[0]
+            end_df = self.df_data_all.iloc[-1].name[0]
+
+            # If self.df_signals.shape[0] != 0 and there are 1 or more wait signals:
+            #   (1) detect_signal() and check_signal_validity() will use newest wait signal as the starting point:
+            #       (A) IF 2 signals have same time, use smallest resolution
+            #   (2) IF no wait signal, detect_signal() will use the newest of:
+            #       (A) 'valid' (last executed signal) or
+            #       (B) 'invalid'
+            # self.df_signals
 
             if start is not None:  # When secondary resolution is in use change start
                 start_df = start
+            #print(f'\n=======Checking for Signal==========\n {start_df}, {end_df}, {resolution}')
 
             try:  # Is there a SELL signal?
+                #print(f'================= {start_df}, {end_df}, {resolution}')
                 check_sell_1_1 = self.df_data_all.loc[
                                  (slice(start_df, end_df), (resolution), (1), (0, 1), (0, 1), (0, 1), (0, 1)), :]
             except KeyError:
@@ -207,41 +252,53 @@ class Analysis(object):
                     pass
                 else:  # BUY signal detected
                     check_buy = check_buy_1.iloc[-1]
-                    print('Buy signal was detected at', check_buy.name)
                     signal_index = check_buy.name
+                    #print('Buy1 signal was detected at', signal_index)
                     signal = 'buy1'
                     try:
                         # IS there a BUY 2 signal?
+                        ts = signal_index[0] # signal has to be in the same time and resolution
                         check_buy_2 = self.df_data_all.loc[
-                                      (slice(start_df, end_df), (resolution), (0, 1), (0, 1), (0, 1), (1), (0, 1)), :]
+                                      (slice(ts, ts), (resolution), (0, 1), (0, 1), (0, 1), (1), (0, 1)), :]
                     except KeyError:
                         # No buy 2 Signal
                         pass
                     else:  # BUY 2 signal detected
                         check_buy = check_buy_2.iloc[-1]
-                        print('Buy signal was detected at', check_buy_2.name)
                         signal_index = check_buy.name
+                        #print('Buy2 signal was detected at', signal_index)
                         signal = 'buy2'
             else:  # Sell signal detected
                 check_sell_1 = check_sell_1_1.iloc[-1]
-                signal_index = check_sell_1
+                signal_index = check_sell_1.name
                 signal = 'sell1'
                 try:  # Is there a SELL2 signal?
+                    ts = signal_index[0]  # signal has to be in the same time and resolution
+                    #print(f"#256. ts for signal_index[0] = {ts}")
+                    #print(f'#257 signal_index = {signal_index}')
                     check_sell_2_1 = self.df_data_all.loc[
-                                     (slice(start_df, end_df), (resolution), (0, 1), (1), (0, 1), (0, 1), (0, 1)), :]
+                                     (slice(ts, ts), (resolution), (0, 1), (1), (0, 1), (0, 1), (0, 1)), :]
                 except KeyError:
                     # No sell2 signal, but sell1 signal
                     pass
                 else:
                     # Sell 2 signal
                     check_sell_2 = check_sell_2_1.iloc[-1]
-                    signal_index = check_sell_2
+                    signal_index = check_sell_2.name
                     signal = 'sell2'
             # end detect_signal
+            csv_data = self.df_data_all_path + '/' + self.date_for_file + 'signals.csv'
+            with open (csv_data, 'a') as write_file:
+                writer = csv.writer(write_file)
+                writer.writerow([signal, signal_index])
+
+            # if signal is not None:
+                #print(f'++++++++++++++signal+++++++++++++\n {signal_index}, {signal}')
+            #print('current signal time:', self.signal_index)
             return signal, signal_index
 
         # 2/7/22: Updated for simpler signals handling; should probably be updated to receive idx instead of (timestamp, resolution)
-        def check_signal_validity(signal, signal_index):
+        def check_signal_validity(signal, signal_index, resolution):
             signal_time = signal_index[0]
             execution_time = None
             execution_resolution = None
@@ -250,8 +307,10 @@ class Analysis(object):
             def signal_1():
                 change_counter = 0
                 changes_list = []
-                end_time = self.df_data.iloc[-1].name[0]  # item[0] of the series' name (index) is tiemstamp
-                check_transaction_df = self.df_data.loc[(slice(signal_time, end_time), resolution), :]
+                end_time = self.df_data_all.iloc[-1].name[0]  # item[0] of the series' name (index) is tiemstamp
+                #print(f'Ready to check transaction with signal_time {signal_time}, end: {end_time}, res: {resolution}')
+                check_transaction_df = self.df_data_all.loc[(slice(signal_time, end_time), resolution, (0, 1), (0, 1), (0, 1), (0, 1), (0, 1)), :]
+                #print(f'validity check. start: {signal_time}, end: {end_time}, res: {resolution}')
                 index_list = check_transaction_df.index
                 last_row = index_list[-1]
                 execution_time = last_row[0]
@@ -260,7 +319,7 @@ class Analysis(object):
                 # Has the color of the candles (direction of close) changed only once?
                 # (1/2) Assign color to the candles
                 for idx in index_list:
-                    if self.df_data.loc[idx, 'c'] > self.df_data.loc[idx, 'o']:
+                    if self.df_data_all.loc[idx, 'c'] > self.df_data_all.loc[idx, 'o']:
                         changes_list.append('green')
                     else:
                         changes_list.append('red')
@@ -273,7 +332,7 @@ class Analysis(object):
                 # Diagram decision 1: Did te direction of the closing price change more than once?
                 if change_counter < 2:
                     # Diagram decision 2: Did the candle close inside upper1 and lower1
-                    if self.df_data.loc[last_row, 'upper1'] > self.df_data.loc[last_row, 'c'] > self.df_data.loc[last_row, 'lower1']:
+                    if self.df_data_all.loc[last_row, 'upper1'] > self.df_data_all.loc[last_row, 'c'] > self.df_data_all.loc[last_row, 'lower1']:
                         # Diagram outcome 3
                         signal_status = 'Valid'
                     else:
@@ -289,8 +348,9 @@ class Analysis(object):
             def signal_2():
                 change_counter = 0
                 changes_list = []
-                end_time = self.df_data.iloc[-1].name[0]  # item[0] of the series' name (index) is tiemstamp
-                check_transaction_df = self.df_data.loc[(slice(signal_time, end_time), resolution), :]
+                end_time = self.df_data_all.iloc[-1].name[0]  # item[0] of the series' name (index) is timestamp
+                #print(f'#325. signal_time = {signal_time}, end_time = {end_time}')
+                check_transaction_df = self.df_data_all.loc[(slice(signal_time, end_time), resolution, (0, 1), (0, 1), (0, 1), (0, 1), (0, 1)), :]
                 index_list = check_transaction_df.index
                 last_row = index_list[-1]
                 signal_status = None
@@ -299,7 +359,7 @@ class Analysis(object):
                 # Has the color of the candles (direction of close) changed only once?
                 # (1/2) Assign color to the candles
                 for idx in index_list:
-                    if self.df_data.loc[idx, 'c'] > self.df_data.loc[idx, 'o']:
+                    if self.df_data_all.loc[idx, 'c'] > self.df_data_all.loc[idx, 'o']:
                         changes_list.append('green')
                     else:
                         changes_list.append('red')
@@ -327,22 +387,28 @@ class Analysis(object):
                 signal, signal_status, execution_time, execution_resolution = signal_2()
                 #if signal 2 is invalid, it should continue status as signal 1
                 if signal_status == 'Invalid':
-                    signal, signal_status = signal_1()
+                    signal, signal_status, execution_time, execution_resolution = signal_1()
                     signal = signal[:len(signal)-1]+'1'
+
+            csv_data = self.df_data_all_path + '/' + self.date_for_file + 'signal_validity.csv'
+            with open (csv_data, 'a') as write_file:
+                writer = csv.writer(write_file)
+                writer.writerow([signal, signal_index, signal_status])
             return signal, signal_status, execution_time, execution_resolution
 
         # 2/7/22: Calls detect_signal(), which returns (signal, index)
         # The use primary and use secondary functions analyze signals and data and send the execution signal
         # Replaces use_primary() abd use_secondary()
         def perform_analysis(idx):
+            #print(f'\n============performing analysis with=============\n{idx}')
             # will work with primary or secondary resolution
-
             self.df_data_all.sort_index(inplace=True)
             index_list = self.df_data_all.index
-            resolution = idx[1]
+            # resolution = idx[1]
             transaction_execution = False
-            execution_time = None
-            execution_resolution = None
+            execution_time = None # idx[0] #
+            execution_resolution = None # idx[1] #
+            signals_complete = None
             # The above vars will be returned unchanged if the idx does not have primary or secondary resolution
             # this can be used to ensure that analysis runs before stoploss check in a case when
             # @ 1m data is received before @5m or @15m. For example:
@@ -356,16 +422,22 @@ class Analysis(object):
             sub_signal_status = None
             sub_signal_index = None
 
-            if resolution == self.PRIMARY_RESOLUTION:
-                if check_signals_complete(idx): # data has all the sub-signals
+            #if resolution == self.PRIMARY_RESOLUTION:
+            if not self.use_smaller_resolution:
+                # print("analysis with principal resolution", idx[0], idx[1])
+                signals_complete = check_signals_complete(idx, self.PRIMARY_RESOLUTION)
+                if signals_complete: # data has all the sub-signals
                     signal, signal_index = detect_signal(self.PRIMARY_RESOLUTION)
                     if signal is not None: # there is a signal
                         # check for sub-signal
+                        print(f'\n==========signal {signal} detected @ perform analysis=========\n{signal_index}')
                         start = signal_index[0]
                         sub_signal, sub_signal_index = detect_signal(
                             self.RESOLUTIONS[self.RESOLUTIONS.index(self.PRIMARY_RESOLUTION) + 1], start)
+                        #print(f'checking sub-signals with sart: {start}, res:', self.RESOLUTIONS[self.RESOLUTIONS.index(self.PRIMARY_RESOLUTION) + 1])
                         if sub_signal is not None:  # there is a sub-signal
-                            sub_signal, sub_signal_status, execution_time, execution_resolution = check_signal_validity(sub_signal, sub_signal_index)
+                            sub_signal, sub_signal_status, execution_time, execution_resolution = \
+                                check_signal_validity(sub_signal, sub_signal_index, self.RESOLUTIONS[self.RESOLUTIONS.index(self.PRIMARY_RESOLUTION) + 1])
                             if sub_signal_status == 'Valid': # Need to do or return something else?
                                 # execute transaction
                                 transaction_execution = True
@@ -381,7 +453,9 @@ class Analysis(object):
                                 # nothing needs to be done, since principal resolution is being used and will remain in use
                                 pass
                         else: # no sub-signal
-                            signal, signal_status, execution_time, execution_resolution = check_signal_validity(signal, signal_index)
+                            signal, signal_status, execution_time, execution_resolution = \
+                                check_signal_validity(signal, signal_index, self.PRIMARY_RESOLUTION)
+                            print(f'checking validity. Signal: {signal}, Index: {signal_index}')
                             if signal_status == 'Valid': # Need to do or return something else?
                                 # execute transaction
                                 transaction_execution = True
@@ -399,48 +473,68 @@ class Analysis(object):
                                 self.signal_resolution = None
                                 self.use_smaller_resolution = False
                                 self.SECONDARY_RESOLUTION = None
-            elif resolution == self.SECONDARY_RESOLUTION:
-                signal, signal_index = detect_signal(self.SECONDARY_RESOLUTION)
-                if signal is not None:  # there is a signal
-                    signal, signal_status, execution_time, execution_resolution = check_signal_validity(signal, signal_index)
-                    if signal == 'Valid':
-                        # execute transaction
-                        transaction_execution = True
-                    elif signal == 'Wait':
-                        # Wait @ secondary resolution
-                        self.signal_index = sub_signal_index
-                        self.signal = sub_signal
-                        self.signal_time = sub_signal_index[0]
-                        self.signal_resolution = sub_signal_index[1]
-                        self.use_smaller_resolution = True
-                        self.SECONDARY_RESOLUTION = sub_signal_index[1]
-                    elif signal == 'Invalid':
-                        # Revert to principal resolution
-                        self.SECONDARY_RESOLUTION = None
-                        self.use_smaller_resolution = False
-            return transaction_execution, execution_time, execution_resolution
+            # elif resolution == self.SECONDARY_RESOLUTION:
+            if self.use_smaller_resolution:
+                # print("analysis with secondary resolution", idx[0], idx[1])
+                signals_complete = check_signals_complete(idx, self.SECONDARY_RESOLUTION)
+                if signals_complete:  # data has all the sub-signals
+                    signal, signal_index = detect_signal(self.SECONDARY_RESOLUTION)
+                    if signal is not None:  # there is a signal
+                        signal, signal_status, execution_time, execution_resolution = \
+                            check_signal_validity(signal, signal_index, self.SECONDARY_RESOLUTION)
+                        if signal == 'Valid':
+                            # execute transaction
+                            transaction_execution = True
+                        elif signal == 'Wait':
+                            # Wait @ secondary resolution
+                            self.signal_index = sub_signal_index
+                            self.signal = sub_signal
+                            self.signal_time = sub_signal_index[0]
+                            self.signal_resolution = sub_signal_index[1]
+                            self.use_smaller_resolution = True
+                            self.SECONDARY_RESOLUTION = sub_signal_index[1]
+                        elif signal == 'Invalid':
+                            # Revert to principal resolution
+                            self.SECONDARY_RESOLUTION = None
+                            self.use_smaller_resolution = False
+            #else:
+                # Needs to send any resolution that is not primary to check_signals_complete in case data arrives out of order
+                #print("analysis with neither prinipal or secondary resolution", idx[0], idx[1])
+                #res_to_use = self.PRIMARY_RESOLUTION if self.use_smaller_resolution == False else self.SECONDARY_RESOLUTION
+                #signals_complete = check_signals_complete(idx, res_to_use)
+            if transaction_execution:
+                print(f'Ex: {transaction_execution}, Ex Time: {execution_time}, res: {execution_resolution}, complete: {signals_complete}, idx: {idx}')
+            return transaction_execution, execution_time, execution_resolution, signals_complete
 
         # Access to inner functions
         timestamp = idx[0]
         resolution = idx[1]
 
         # Needs to run at every resolution in case signals arrive out of order
-        transaction_execution, execution_time, execution_resolution = perform_analysis(idx)
+        transaction_execution, execution_time, execution_resolution, signals_complete = perform_analysis(idx)
+        # print(f'{idx} tr_ex: {transaction_execution}, ex_t: {execution_time}, ex_res: {execution_resolution}, comp: {signals_complete}')
         # The transaction_execution dictates if a transaction or correction (stoploss) will be performed
         # if it is None, no analysis was conducted; if True a transaction will be executed; if False a correction
         # a correction decides whether a stoploss should be executed or not
 
-        if timestamp[0].minute % 5 != 0:  # will execute only @1m
-            # Set the time and resolution for the stoploss check according to the idx
-            self.check_transaction_execution(idx[0], idx[1], False)
-        else:  # if minutes are a multiple of 5
+        # Need to ensure that sub-signals are complete
+        if signals_complete:
             if transaction_execution is not None:  # if the analysis has been conducted then check stoploss
+                #print(f'These are the args sent @5 and @15: {execution_time}, {execution_resolution}, {transaction_execution}')
                 self.check_transaction_execution(execution_time, execution_resolution, transaction_execution)
+        else:
+            if resolution == self.RESOLUTIONS[-1]:  # will execute only @1m
+                # Set the time and resolution for the stoploss check according to the idx
+                # print('This is i the index @1m:', idx)
+                if self.last_transaction is not None:  # algo has just started and there is no transaction fro stoploss
+                    self.check_transaction_execution(idx[0], idx[1], False)
         return
 
     # Incomplete. Work in progress 2/5/22
     # Called by analyze_signal_and_data
     def check_transaction_execution(self, execution_time, execution_resolution, transaction_execution):
+        #if execution_time is not None:
+            #print(f'=================Execution==============\n{execution_time}, {execution_resolution}, {transaction_execution}')
         timestamp = execution_time
         resolution = execution_resolution
 
@@ -449,21 +543,21 @@ class Analysis(object):
         def execute_transaction(transaction_execution, stoploss):
             # (1/2) Data recording and changes to instance variables
             # returns the values of SD and close to use in either stoploss or transaction
-            execution_candle = self.df_data.loc[(slice(timestamp, timestamp)), resolution]
-            close = execution_candle[3]
-            mins = execution_candle.name[0].minutes
-            extra_mins = mins % 15
-            sd = 0.0
-            if extra_mins % 5 != 0:
-                new_ts = execution_candle.name[0] - timedelta(minutes=extra_mins)
-                series_for_sd = self.df_data.loc[(slice(new_ts, new_ts)), 5]
-                sd = series_for_sd[11]
-            elif extra_mins % 5 == 0:
-                sd = execution_candle[11]
-            elif extra_mins == 0:
-                new_ts = execution_candle.name[0] + timedelta(minutes=extra_mins)
-                series_for_sd = self.df_data.loc[(slice(new_ts, new_ts)), 5]
-                sd = series_for_sd[11]
+            execution_candle = self.df_data_all.loc[
+                                     (slice(timestamp, timestamp), 5, (0, 1), (0, 1), (0, 1), (0, 1), (0, 1)), :]
+            #print('XXXXXXXXXXXX\n', execution_candle.iloc[-1])
+            last_idx = execution_candle.iloc[-1].name
+            close_delta = execution_resolution - 5 #Because we always use the @5m for the SD of the stoploss
+            close_delta = close_delta.item()
+            # print(f'close delta is {close_delta} of type', type(close_delta))
+            close_time = last_idx[0] + timedelta(minutes=close_delta)
+            close_candle = self.df_data_all.loc[
+                           (slice(close_time, close_time), 5, (0, 1), (0, 1), (0, 1), (0, 1), (0, 1)), :]
+            close_idx = close_candle.index[0]
+            #print('close index:', close_idx)
+            close = close_candle.loc[close_idx, 'c']
+            sd = close_candle.loc[close_idx, 'SD']
+            #print(f'sd is {sd} at', close_idx[0])
             # Record data for all transactions
             # Instance Variables to update with any transaction; regular or stoploss
             self.last_sd = sd
@@ -495,16 +589,16 @@ class Analysis(object):
                 self.SECONDARY_RESOLUTION = None
                 self.use_smaller_resolution = False
             # Set new stoploss
-            set_stoploss_limit()
+            set_stoploss_limit(sd)
             # (2/2) Process transaction
-
             # Code goes here to send transaction to module that processes with exchange
 
             # Record paper trade
-            paper_trade()
+            paper_trade(stoploss)
             return
 
-        def paper_trade():
+        def paper_trade(stoploss):
+            print('Paper Trade')
             COMMISSION = 0.0008
             current_balance = self.paper_balance_amount
             current_currency = self.paper_balance_currency
@@ -541,31 +635,41 @@ class Analysis(object):
                       "signal": [signal], "c": [c], "limit": [limit], "stoploss": [stop_loss], "transaction": [trans],
                       "balance": [balance], "currency": [currency]}
             df_append = pd.DataFrame.from_dict(append)
-            self.df_transactions = self.df_data.append(df_append, ignore_index=False)
+            self.df_transactions = self.df_transactions.append(df_append, ignore_index=False)
 
-            csv_data = self.df_data_path + '/' + self.date_for_file + 'transactions.csv'
-            self.df_data.to_csv(csv_data, index=True, mode='a', header=False)
+            csv_data = self.df_data_all_path + '/' + self.date_for_file + 'transactions.csv'
+            if self.df_transactions.shape[0] > 1:
+                self.df_transactions.to_csv(csv_data, index=True, mode='a', header=False)
+            else:
+                self.df_transactions.to_csv(csv_data, index=True, mode='a', header=True)
+
+
 
         # decides whether a  stoploss is needed or not
         # Finished 2/4/2021
         def analyze_stoploss():
             stoploss = False
-            minutes = timestamp[0].minute
+            print('TimeStamp in analyze stoploss is:', timestamp)
+            minutes = timestamp.minute
             limit = self.stoploss_limit
             transaction = self.last_transaction
             last_price = self.last_transaction_close
 
             # 1 1m candle that goes past 2x limit will trigger stoploss
             def check_1_min():
+                stoploss = False
                 try:
                     # slice to find data with the timestamp, resolution
-                    data_df_slice = self.df_data.loc[(slice(timestamp, timestamp)), resolution]
+                    data_df_slice = self.df_data_all.loc[
+                                     (slice(timestamp, timestamp), (resolution), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1)), :]
                 except IndexError:
                     # No data of the timestamp, resolution; nothing happens
                     pass
                 else:
                     # There is data, retrieve the price close
-                    close = data_df_slice[3]
+                    slice_key = data_df_slice.index[0]
+                    print(slice_key)
+                    close = data_df_slice.at[slice_key, 'c']
                     if transaction == "BUY":
                         if close < last_price - (limit * 2):
                             stoploss = True
@@ -589,7 +693,8 @@ class Analysis(object):
                     start = self.last_transaction_timestamp
 
                 end = timestamp
-                check_stoploss_df = self.df_data.loc[(slice(start, end), 5), :]
+                check_stoploss_df = self.df_data_all.loc[
+                                     (slice(start, end), (resolution), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1)), :]
                 index_list = check_stoploss_df.index
                 candle_colors = []
                 candle_past_limit = []
@@ -597,12 +702,12 @@ class Analysis(object):
 
                 # Assign color to the candles
                 for idx in index_list:
-                    if self.df_data.loc[idx, 'c'] > self.df_data.loc[idx, 'o']:
+                    if self.df_data_all.loc[idx, 'c'] > self.df_data_all.loc[idx, 'o']:
                         candle_colors.append('green')
                     else:
                         candle_colors.append('red')
                     # Assign positive value c > limit; negative otherwise
-                    if self.df_data.loc[idx, 'c'] > limit:
+                    if self.df_data_all.loc[idx, 'c'] > limit:
                         candle_past_limit.append(1)
                     else:
                         candle_past_limit.append(-1)
@@ -633,6 +738,7 @@ class Analysis(object):
                 temp_stoploss = check_5_min()
                 if temp_stoploss:
                     stoploss = temp_stoploss
+            print(f'stoploss is {stoploss}')
             return stoploss
 
         # transaction_close is the close of the candle that executed the transaction
@@ -651,9 +757,16 @@ class Analysis(object):
 
         # executes a transaction or a stoploss check
         # Finished 2/4/2021
-        if not transaction_execution:
-            stoploss = analyze_stoploss()
-            execute_transaction(transaction_execution, stoploss)
+        if not transaction_execution: # transaction_execution is False
+            if self.last_transaction is not None: # if there is a previous transaction
+                stoploss = analyze_stoploss() # analyze if a stoploss needs to be performed
+                # print(f'perform execute_transaction with EX: {transaction_execution} and Stoploss: {stoploss}')
+                # Maybe execute this line only if stoploss is True???
+                if stoploss:
+                    execute_transaction(transaction_execution, stoploss) # perform the stoploss if needed
+            else: # if there is no previous transaction
+                # print("No previous transaction. No stoploss needed")
+                pass
         else:
-            execute_transaction(transaction_execution, False)
+            execute_transaction(transaction_execution, stoploss=False)
         return

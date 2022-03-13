@@ -50,9 +50,9 @@ class Analysis(object):
         self.RSI_OVERSOLD = 33
 
         # time resolution that the algorithm is working with
-        self.RESOLUTIONS = [15, 5, 1]  # time resolutions available for teh algo to use
-        self.PRIMARY_RESOLUTION = 15  # default working resolution
-        self.SECONDARY_RESOLUTION = 5
+        self.RESOLUTIONS = [45, 15, 5, 1]  # time resolutions available for teh algo to use
+        self.PRIMARY_RESOLUTION = 45  # default working resolution
+        self.SECONDARY_RESOLUTION = 15
         self.use_smaller_resolution = False
 
         # Signals Data Frame stores signals and their state.

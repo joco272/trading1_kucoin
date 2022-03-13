@@ -6,7 +6,7 @@ def read_historical_data(analysis):
 
 
     ollu_data = 'C:/Users/jocox/Dropbox/Trading/James/Historical_Data_for_Simulations/all_data.csv'
-    envy_data = 'D:/Dropbox/Trading/James/Historical_Data_for_Simulations/all_data.csv'
+    envy_data = 'D:/Dropbox/Trading/James/Historical_Data_for_Simulations/all_data_2-28_3-7_Type_1_only.csv'
     test_data = 'D:/Dropbox/Trading/James/Historical_Data_for_Simulations/test_all_data.csv'
 
     with open(envy_data, 'r') as data:
@@ -25,18 +25,18 @@ def read_historical_data(analysis):
             l2 = float(line[10])
             basis = float(line[8])
             sd = float(line[19])
-            vol = float(line[4])
+            vol = float(line[7])
             s1 = float(line[14])
-            s2 = float(line[16])
             b1 = float(line[13])
             b2 = float(line[15])
+            s2 = float(line[16])
             nt = float(line[17])
             rsi = float(line[6])
             t_to_process = line[0]
             t = t_to_process[0: -4].replace('T', ' ')
 
-            append = {'time': [t], 'timeline': [int(tl)], 's1': [int(s1)], 's2': [int(s2)], 'b1': [int(b1)],
-                      'b2': [int(b2)], 'nt': [int(nt)], 'o': [float(o)], 'h': [float(h)], 'l': [float(l)], 'c': [float(c)],
+            append = {'time': [t], 'timeline': [int(tl)], 'b1': [int(b1)], 's1': [int(s1)], 'b2': [int(b2)],
+                      's2': [int(s2)], 'nt': [int(nt)], 'o': [float(o)], 'h': [float(h)], 'l': [float(l)], 'c': [float(c)],
                       'basis': [float(basis)], 'SD': [float(sd)], 'lower2': [float(l2)], 'upper2': [float(u2)],
                       'lower1': [float(l1)], 'upper1': [float(u1)], 'vol': [float(vol)], 'rsi': [float(rsi)]}
 
@@ -45,6 +45,7 @@ def read_historical_data(analysis):
 
             # convert date to datetime format
             df_append['time'] = pd.to_datetime(df_append['time'], format="%Y-%m-%d %H:%M")
-            # df_data_open = df_data_open.set_index(['time'])
-
+            df_append.set_index(['time', 'timeline', 'b1', 's1', 'b2', 's2', 'nt'], inplace=True)
+            #print(df_append)
+            #sleep(1)
             analysis.merge_data_all(df_append)

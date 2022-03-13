@@ -53,7 +53,7 @@ if __name__ == "__main__":
     # t2.setDaemon(True)
 
     t = Thread(target=read_historical_data.read_historical_data(analysis))
-    t.start()
+    # t.start()
 
     t1.start()
     t3.start()

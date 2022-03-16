@@ -32901,3 +32901,163 @@ FileNotFoundError: [Errno 2] No such file or directory: 'D:/Dropbox/Trading/Jame
 2022-03-09 18:10:08,979 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
 2022-03-09 18:10:09,018 INFO :: Kucoin Web Socket connection opened.
 2022-03-09 18:10:09,401 INFO :: Kucoin Web Socket connection opened.
+2022-03-14 14:57:48,864 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-14 14:57:48,864 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-14 14:57:49,247 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-14 14:57:49,249 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-14 14:57:50,378 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-14 14:57:51,067 INFO :: Kucoin Web Socket connection opened.
+2022-03-14 14:57:51,097 INFO :: Kucoin Web Socket connection opened.
+2022-03-14 16:30:07,489 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-14 16:30:07,489 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-14 16:30:07,798 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-14 16:30:07,815 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-14 16:30:08,489 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-14 16:30:08,669 INFO :: Kucoin Web Socket connection opened.
+2022-03-14 16:30:08,673 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 07:55:41,926 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 07:55:41,927 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 07:55:42,924 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 07:55:43,022 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 07:55:43,025 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 07:55:44,623 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 07:55:44,644 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 08:00:47,793 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 08:00:47,794 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 08:00:48,174 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 08:00:48,179 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 08:00:48,794 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 08:00:48,901 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 08:00:48,927 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 08:03:03,462 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 08:03:03,464 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 08:03:03,710 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 08:03:03,718 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 08:24:56,715 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 08:24:56,717 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 08:24:57,019 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 08:24:57,044 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 08:24:57,720 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 08:24:57,818 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 08:24:57,821 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 08:57:50,050 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 08:57:50,051 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 08:57:50,496 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 08:57:50,503 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 08:57:51,634 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 08:59:43,951 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 08:59:43,952 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 08:59:44,198 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 08:59:44,207 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 09:09:12,829 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 09:09:12,830 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 09:09:13,124 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 09:09:13,130 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 09:15:04,552 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 09:15:04,553 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 09:15:32,869 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 09:15:32,870 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 09:15:33,117 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 10:09:44,124 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 10:09:44,125 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 10:09:45,133 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 10:09:45,182 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 10:39:09,336 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 10:39:09,337 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 10:39:09,664 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 10:39:09,677 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 10:39:10,339 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 10:39:10,422 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 10:39:10,438 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 10:47:14,685 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 10:47:14,685 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 10:47:15,021 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 10:47:15,034 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 11:09:02,355 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 11:09:02,356 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 11:09:03,484 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 11:09:03,722 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 11:09:03,741 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 11:09:04,456 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 11:09:04,468 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 11:36:52,130 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 11:36:52,130 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 11:36:52,453 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 11:36:52,469 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 11:36:53,128 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 11:36:53,191 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 11:36:53,196 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 12:04:09,742 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 12:04:09,742 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 12:04:10,085 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 12:04:10,096 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 12:04:10,746 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 12:04:10,848 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 12:04:10,849 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 12:54:37,837 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 12:54:37,838 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 12:54:38,843 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 12:54:38,895 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 12:54:38,909 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 12:54:40,434 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 12:54:40,446 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 15:08:36,396 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 15:08:36,398 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 15:08:36,758 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 15:08:36,774 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 15:08:37,874 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 15:08:38,578 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 15:08:38,630 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 15:20:47,382 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 15:20:47,382 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 15:20:47,717 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 15:20:47,726 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 15:20:48,820 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 15:20:49,475 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 15:20:49,487 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 15:29:22,417 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 15:29:22,418 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 15:29:22,726 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 15:29:22,744 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 15:29:23,413 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 15:29:23,488 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 15:29:23,512 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 17:55:44,213 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 17:55:44,213 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 17:55:44,559 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 17:55:44,564 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 17:55:45,502 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 17:55:46,163 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 17:55:46,214 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 19:22:44,738 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 19:22:44,738 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 19:22:45,138 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 19:22:45,173 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 19:22:46,253 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 19:22:46,934 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 19:22:46,947 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 19:54:07,989 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 19:54:07,990 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 19:54:08,325 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 19:54:08,328 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 19:54:09,448 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 19:54:10,113 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 19:54:10,118 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 20:02:48,400 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 20:02:48,401 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 20:02:48,754 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 20:02:48,755 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 20:02:49,399 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 20:02:49,518 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 20:02:49,574 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 20:07:24,472 ERROR :: 66.240.205.34 - - [15/Mar/2022 20:07:24] code 400, message Bad request version ('оп]')
+2022-03-15 20:08:51,059 ERROR :: 192.241.226.8 - - [15/Mar/2022 20:08:51] code 400, message Bad request syntax ('MGLNDD_136.50.227.185_80')
+2022-03-15 20:08:51,059 INFO :: 192.241.226.8 - - [15/Mar/2022 20:08:51] "[35m[1mMGLNDD_136.50.227.185_80[0m" HTTPStatus.BAD_REQUEST -
+2022-03-15 20:12:20,523 INFO :: 184.105.247.252 - - [15/Mar/2022 20:12:20] "[33mGET / HTTP/1.1[0m" 404 -
+2022-03-15 21:01:48,931 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 21:01:48,932 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-15 21:01:49,238 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 21:01:49,689 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-15 21:01:50,149 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
+2022-03-15 21:01:50,830 INFO :: Kucoin Web Socket connection opened.
+2022-03-15 21:01:50,841 INFO :: Kucoin Web Socket connection opened.

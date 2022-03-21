@@ -21,6 +21,9 @@ class Analysis(object):
         self.df_data_all = pd.DataFrame(columns=self.data_all_var, index=[])
         self.df_ticker = pd.DataFrame(self.ticker_var, index=[])
 
+        # change D:/Dropbox to C:/Users/jocox/Dropbox
+        # when changing from personal to OLLU and viceversa
+
         # set index of some dfs to `time`
         self.date = datetime.strptime("2021-01-01 00:00", "%Y-%m-%d %H:%M")
         self.init = pd.DataFrame({'time': [self.date]})
@@ -42,15 +45,15 @@ class Analysis(object):
         self.date_time = datetime.now()
         self.time = self.date_time.strftime("%Y_%m_%d-%H-%M-%S")
         self.date_for_file = self.date_time.strftime("%Y_%m_%d")
-        self.ticker_path = 'D:/Dropbox/Trading/James/csv/ticker'
-        self.df_data_all_path = 'D:/Dropbox/Trading/James/csv/data_all'
+        self.ticker_path = 'C:/Users/jocox/Dropbox/Trading/James/csv/ticker'
+        self.df_data_all_path = 'C:/Users/jocox/Dropbox/Trading/James/csv/data_all'
 
         # trade signal variables:
         self.RSI_OVERBOUGHT = 64
         self.RSI_OVERSOLD = 33
 
         # time resolution that the algorithm is working with
-        self.RESOLUTIONS = [45, 15, 5, 1]  # time resolutions available for teh algo to use
+        self.RESOLUTIONS = [45, 15]  # time resolutions available for teh algo to use
         self.PRIMARY_RESOLUTION = 45  # default working resolution
         self.SECONDARY_RESOLUTION = 15
         self.use_smaller_resolution = False
@@ -80,7 +83,7 @@ class Analysis(object):
                                  'signal': str(), 'c': float(), 'limit': float(), 'stoploss': bool(),
                                  'transaction': str(), 'balance': float(), 'currency': float()}
         self.df_transactions = pd.DataFrame(columns=self.transactions_var)
-        self.df_transactions_path = 'D:/Dropbox/Trading/James/paper_trading'
+        self.df_transactions_path = 'C:/Users/jocox/Dropbox/Trading/James/paper_trading'
         #  1/23/22 @ 23:45Z: Sell1; 1/24/22 @ 00:00Z execute @ 15m, close = $2,516.17
         #  comission 0.01% -20% for paying with Kucoin token = 0.008%
         # starting balance = $2,516.17 (1 ETH eq) - 0.008% = $2,514.16 USDT
@@ -285,9 +288,12 @@ class Analysis(object):
 
         # 2/7/22: Updated for simpler signals handling; now detects buy2 and sell2
         # 2/22/22 0439. Debug: Working OK with sell1
-        def detect_signal(resolution, start=None):
+        def detect_signal(resolution, start_idx=None):
             # Helper function for use resolution functions. Helps not repeat code
-            print(f'253-detect_signal. idx: {idx}, (res: {resolution}, start: {start})')
+
+            if start_idx is not None:
+                start = start_idx[0]
+            print(f'293-detect_signal. idx: {idx}, (res: {resolution}, start: {start_idx})')
 
             signals = []
             signal = None
@@ -353,11 +359,13 @@ class Analysis(object):
                     start_df = check_signals.iloc[-1].name[0] + timedelta(minutes=delta) #timedelta(minutes=delta)
 
             # Used when the start time is set (searching for sub-signals
-            if start is not None:  # When scanning for sub-signals change df_start the signal timestamp
-                start_df = start
-                delta = resolution-1
-                end_df = start + timedelta(minutes=delta)
-
+            if start_idx is not None:  # When scanning for sub-signals change df_start the signal timestamp
+                start_df = start_idx[0]
+                delta = start_idx[1]-1
+                if not isinstance(delta, int):
+                    delta = delta.item()
+                end_df = start_df + timedelta(minutes=delta)
+                #print(f'363-start_df = {start_df}, end_df = {end_df}')
             # Start of signal detection
             try:  # Is there a sell1 signal?
                 check_sell_1_1 = self.df_data_all.loc[
@@ -370,7 +378,7 @@ class Analysis(object):
                     pass
                 else:  # buy1 signal detected. There may also be a buy2, since it's a sub-type of buy1
                     check_buy_1 = check_buy_1_1.iloc[-1]
-                    #print('Buy1 signal was detected at', signal_index)
+                    #print('376-Buy1 signal was detected at:', check_buy_1.name)
                     signal = 'buy1'
                     signals.append([check_buy_1.name, signal])
                     try:
@@ -471,6 +479,7 @@ class Analysis(object):
                             # a series when using all of the mI. KeyErrror raised if the key does not exist
                             # https://pandas.pydata.org/pandas-docs/version/0.22/generated/pandas.DataFrame.xs.html
                             check_ts = self.df_signals.xs((ts, tl))
+                            print(f'477-Check_ts{check_ts.index}:\n{check_ts}')
                         except KeyError:  # The index does not exist in the DF. Append it.
                             #print('429-The signal to append does not exists. Append it')
                             #print(f'self._df_signals: {self.df_signals}')
@@ -500,7 +509,7 @@ class Analysis(object):
                 wait_signals = signals_to_append
                 num_signals = signals_to_append.shape[0]
 
-            if start is None:
+            if start_idx is None:
                 if self.df_signals.shape[0] > 0:
                     start_signals = self.df_signals.iloc[0]
                     end_signals = self.df_signals.iloc[-1]
@@ -523,7 +532,7 @@ class Analysis(object):
                         end_signals = self.df_signals.iloc[-1]
                         try:  # this has to be done for the entire signal df and select the last for the working res
                             wait_signals = self.df_signals.loc[
-                                           (slice(start, end_signals.name[0]), resolution,
+                                           (slice(start_idx[0], end_signals.name[0]), resolution,
                                             (0, 1), (0, 1), (0, 1), (0, 1), (0, 1), (0)), :]  # df containing the wait signals
                         except KeyError:  # There are no wait signals
                             pass
@@ -539,14 +548,14 @@ class Analysis(object):
 
             #print(f'\n=======Checking for Signal==========\n start: {start_df}, end: {end_df}, resolution: {resolution}\n==================')
             #print(f'=============signals to append\n{signals_to_append}\n=================')
-            print(f'495===============DF Signals at idx: {idx}\n{self.df_signals}\n====================')
-            print(f'496-Num signals: {num_signals}, wait signals: {wait_signals}')
+            #print(f'495===============DF Signals at idx: {idx}\n{self.df_signals}\n====================')
+            #print(f'496-Num signals: {num_signals}, wait signals: {wait_signals}')
             return num_signals, wait_signals  # num_signals helps avoid df slicing in subsequent steps
 
 
         def check_signal_validity(signal_index, resolution):
             print(f'501- check_signal_validity({resolution})')
-            print(f'502- Validating Signal_index = {signal_index}')
+            print(f'502- Validating Signal_index: {signal_index} at (Time: {idx[0], idx[1]})')
             print(f'503-use_smaller_res: {self.use_smaller_resolution}')
             signal = self.df_signals.loc[signal_index]
 
@@ -769,7 +778,7 @@ class Analysis(object):
                                     transaction_execution = True
                                 elif sub_signal_status == 3:  # 'invalid':
                                     self.change_signal_state(secondary_signal_index.index, 3)
-                print(f"725-signals complete check with index {idx[0]}, {idx[1]} and resolution {resolution}")
+                #print(f"725-signals complete check with index {idx[0]}, {idx[1]} and resolution {resolution}")
                 signals_complete = check_signals_complete(idx, resolution)
                 if signals_complete: # data has all the sub-signals
                     #signal, signal_index = detect_signal(self.PRIMARY_RESOLUTION)
@@ -780,20 +789,21 @@ class Analysis(object):
                         signal_index = wait_signals.iloc[-1].name
                         signal_time = signal_index[0]
                         print(f'735=======================\n{idx} detected signal @ {resolution}\nsignal index:{signal_index}\n==============')
-                        start = signal_index[0]
+                        # signal_index
                         num_sub_signals, wait_sub_signals = 0, None
                         # only check for sub-signals when the current index is a signal
                         if (idx[0] == signal_index[0]) and (idx[1] == signal_index[1]):
-                            print(f'739-{idx[0]} calling detect_signal({self.SECONDARY_RESOLUTION}, Start: {start})')
-                            num_sub_signals, wait_sub_signals = detect_signal(self.SECONDARY_RESOLUTION, start)
-                        print(f'741-wait sub_signals:\n {wait_sub_signals}')
+                            print(f'739-{idx[0]} calling detect_signal({self.SECONDARY_RESOLUTION}, Start: {signal_index})')
+                            num_sub_signals, wait_sub_signals = detect_signal(self.SECONDARY_RESOLUTION, signal_index)
+                            print(f'741-wait sub_signals:\n {wait_sub_signals}')
+                            #print(f'742-df_signals:\n{self.df_signals}')
                         #print(f'detected signal @ main with {num_sub_signals} sub-signals\nsub_signals:\n{wait_sub_signals}')
                         #print(f'checking sub-signals with sart: {start}, res:', self.RESOLUTIONS[self.RESOLUTIONS.index(self.PRIMARY_RESOLUTION) + 1])
                         if num_sub_signals > 0:  # there is a sub-signal (needs wait or valid ONLY)
                             #print(f'==========SUBS==================')
+                            sub_signal_index = wait_sub_signals.iloc[-1].name
                             print(f'746-=======================\n{idx[0]} checking validity with {sub_signal_index} with res {resolution}')
                             #print(f'708-Workign Resolution is {resolution}')
-                            sub_signal_index = wait_sub_signals.iloc[-1].name
                             sub_signal, sub_signal_status = check_signal_validity(sub_signal_index, self.SECONDARY_RESOLUTION)
                             print(f'750-sub_signal {sub_signal_index}@{resolution}: {sub_signal}\n status:{sub_signal_status}\n===========')
                             if sub_signal_status == 1:  # 'valid': # Need to do or return something else?
@@ -842,7 +852,7 @@ class Analysis(object):
                     print("803-analysis with secondary resolution", idx[0], idx[1])
                     signals_complete = check_signals_complete(idx, self.SECONDARY_RESOLUTION)
                     if signals_complete:  # data has all the sub-signals
-                        print('806-signals complete')
+                        print(f'806-signals complete at idx: {idx}')
                         # check validity of last signal before detecting new signal
                         start = self.df_signals.iloc[0].name[0]
                         end = self.df_signals.iloc[-1].name[0]
@@ -853,7 +863,9 @@ class Analysis(object):
                                              (0, 1), (0, 1), (0, 1), (0, 1), 0), :]
                             print(f'812-df to validate. Start: {start}, end: {end}, res: {self.SECONDARY_RESOLUTION}\n{df_to_validate}')
                         except KeyError: #
-                            print('No signal at this res, do nothing')
+                            print('No signal at this res (803 & 806), do nothing\n')
+                            print('813-Changing use_smaller to False')
+                            self.use_smaller_resolution = False
                             pass
                         else:
                             print(f"816- State of. last row: \n{df_to_validate.iloc[-1]}\nstate: {df_to_validate.iloc[-1].name[7]}")
@@ -861,7 +873,6 @@ class Analysis(object):
                                 idx_to_validate = df_to_validate.iloc[-1].name
                                 old_signal, old_state = check_signal_validity(idx_to_validate, self.SECONDARY_RESOLUTION)
                                 print(f'825-Result of validation: {old_signal} has state: {old_state}')
-                                self.change_signal_state(idx_to_validate, old_state)
                                 if old_state == 1:
                                     valid_signal = idx_to_validate
                                     # print(f'867-idx_to_validate: {idx_to_validate}')
@@ -870,6 +881,7 @@ class Analysis(object):
                                     pass
                                 elif old_state != 0:
                                     print('827-Changing use_smaller to False')
+                                    self.change_signal_state(idx_to_validate, old_state)
                                     self.use_smaller_resolution = False
                         num_signals, wait_signals = detect_signal(self.SECONDARY_RESOLUTION)
                         #print(f'755- Wait signals: {wait_signals}')
@@ -893,6 +905,32 @@ class Analysis(object):
                                     self.use_smaller_resolution = False
                                     self.change_signal_state(signal_index, 3)
                                 elif signal_status == 2:
+                                    self.use_smaller_resolution = False
+                        elif wait_signals is None and self.use_smaller_resolution:
+                            # Need to check if there is a wait signal and check its validity
+                            try:
+                                df_to_validate = self.df_signals.loc[(slice(start, end), self.SECONDARY_RESOLUTION,
+                                                                      (0, 1), (0, 1), (0, 1), (0, 1), (0, 1), 0), :]
+                                print(
+                                    f'912-df to validate. Start: {start}, end: {end}, res: {self.SECONDARY_RESOLUTION}\n{df_to_validate}')
+                            except KeyError:  # No wait signal. Revert to main
+                                print('No signal at this res (803 & 806), do nothing\n')
+                                print('913-Changing use_smaller to False')
+                                self.use_smaller_resolution = False
+                            else:  # There is a signal. Validate
+                                idx_to_validate = df_to_validate.iloc[-1].name
+                                old_signal, old_state = check_signal_validity(idx_to_validate,
+                                                                              self.SECONDARY_RESOLUTION)
+                                print(f'917-Result of validation: {old_signal} has state: {old_state}')
+                                if old_state == 1:
+                                    valid_signal = idx_to_validate
+                                    # print(f'921-idx_to_validate: {idx_to_validate}')
+                                    # self.change_signal_state(idx_to_validate, 1)
+                                    transaction_execution = True
+                                    pass
+                                elif old_state != 0:
+                                    print('926-Changing use_smaller to False')
+                                    self.change_signal_state(idx_to_validate, old_state)
                                     self.use_smaller_resolution = False
 
             #print(f"analysis with {resolution} resolution", idx[0], idx[1])

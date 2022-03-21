@@ -33061,3 +33061,41 @@ FileNotFoundError: [Errno 2] No such file or directory: 'D:/Dropbox/Trading/Jame
 2022-03-15 21:01:50,149 INFO ::  * Running on http://192.168.0.118:80/ (Press CTRL+C to quit)
 2022-03-15 21:01:50,830 INFO :: Kucoin Web Socket connection opened.
 2022-03-15 21:01:50,841 INFO :: Kucoin Web Socket connection opened.
+2022-03-16 18:26:17,853 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-16 18:26:17,853 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-17 12:47:26,315 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-17 12:47:26,316 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-17 12:47:27,054 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-17 12:47:27,070 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-17 12:47:27,714 INFO :: Kucoin Web Socket connection opened.
+2022-03-17 12:47:27,768 INFO :: Kucoin Web Socket connection opened.
+2022-03-17 13:02:40,561 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-17 13:02:40,562 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-17 13:02:40,853 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-17 13:02:41,276 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-17 13:02:41,605 INFO :: Kucoin Web Socket connection opened.
+2022-03-17 13:02:41,940 INFO :: Kucoin Web Socket connection opened.
+2022-03-17 15:43:44,277 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-17 15:43:44,277 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-17 15:43:44,567 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-17 15:43:44,568 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-17 15:43:45,256 INFO :: Kucoin Web Socket connection opened.
+2022-03-17 15:43:45,262 INFO :: Kucoin Web Socket connection opened.
+2022-03-17 17:44:54,637 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-17 17:44:54,638 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-17 17:44:55,015 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-17 17:44:55,029 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-17 17:44:55,697 INFO :: Kucoin Web Socket connection opened.
+2022-03-17 17:44:55,737 INFO :: Kucoin Web Socket connection opened.
+2022-03-21 05:03:12,025 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-21 05:03:12,025 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-21 05:03:12,351 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-21 05:03:12,353 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-21 05:03:13,024 INFO :: Kucoin Web Socket connection opened.
+2022-03-21 05:03:13,032 INFO :: Kucoin Web Socket connection opened.
+2022-03-21 05:05:55,491 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-21 05:05:55,492 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-03-21 05:05:55,844 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-21 05:05:55,847 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-03-21 05:05:56,630 INFO :: Kucoin Web Socket connection opened.
+2022-03-21 05:05:56,637 INFO :: Kucoin Web Socket connection opened.

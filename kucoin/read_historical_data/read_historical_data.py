@@ -4,7 +4,6 @@ from time import sleep
 
 def read_historical_data(analysis):
 
-
     ollu_data = 'C:/Users/jocox/Dropbox/Trading/James/Historical_Data_for_Simulations/Reslution Comparison/45 and 15.csv'
     envy_data = 'D:/Dropbox/Trading/James/Historical_Data_for_Simulations/all_data_1-28-22_to_3_13_22_res_45_15_5_1_Signal_1_only.csv'
     test_data = 'D:/Dropbox/Trading/James/Historical_Data_for_Simulations/test_all_data.csv'

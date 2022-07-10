@@ -222,7 +222,7 @@ class Analysis(object):
             self.analyze_signal_and_data(idx)
         return
 
-    # this function is called by merge_data_all. Needs to come before
+    # this function is called by merge_data_all.
     def analyze_signal_and_data(self, idx):
         # every candle and every action signal at any resolution should trigger this function
         #print(f'analyze_signal_and_data({idx})')
@@ -284,6 +284,10 @@ class Analysis(object):
                         sub_signals_complete = True  # Added 1/30/22. Make sure I didn't mess up
                         #print(f'(3) ================sub-signals complete: {sub_signals_complete}')
                         #print(f'check_signals_complete. Res: {resolution}; idx: {df_index}; start: {start_sub}; end {end_sub}')
+
+            if self.SECONDARY_RESOLUTION == self.RESOLUTIONS[-1]:
+                sub_signals_complete = True
+            print(f'290-Sub-signals complete: {sub_signals_complete} for idx: {df_index}')
             return sub_signals_complete  # end of inner function 'check_complete'
 
         # 2/7/22: Updated for simpler signals handling; now detects buy2 and sell2
@@ -354,6 +358,7 @@ class Analysis(object):
                     pass
                 else:  # The last signal @ resolution
                     delta = check_signals.iloc[-1].name[1]-1
+                    #print(f'361-last signal: {check_signals.iloc[-1].name}')
                     if not isinstance(delta, int):
                         delta = delta.item()
                     start_df = check_signals.iloc[-1].name[0] + timedelta(minutes=delta) #timedelta(minutes=delta)
@@ -370,6 +375,8 @@ class Analysis(object):
             try:  # Is there a sell1 signal?
                 check_sell_1_1 = self.df_data_all.loc[
                                  (slice(start_df, end_df), (resolution), (0, 1), (1), (0, 1), (0, 1), (0, 1)), :]
+                #print(f'376-check_sell_1_1 start: {start_df}, end: {end_df}, res: {resolution}\n{check_sell_1_1}')
+                #print(f'377-\n{self.df_data_all}')
             except KeyError:  # No sell1 signal
                 try:  # Is there a buy1 signal?
                     check_buy_1_1 = self.df_data_all.loc[
@@ -377,41 +384,45 @@ class Analysis(object):
                 except KeyError:  # No buy1 Signal
                     pass
                 else:  # buy1 signal detected. There may also be a buy2, since it's a sub-type of buy1
-                    check_buy_1 = check_buy_1_1.iloc[-1]
-                    #print('376-Buy1 signal was detected at:', check_buy_1.name)
-                    signal = 'buy1'
-                    signals.append([check_buy_1.name, signal])
-                    try:
-                        # IS there a BUY 2 signal?
-                        ts = check_buy_1.name[0] # signal has to be in the same time and resolution
-                        check_buy_2_1 = self.df_data_all.loc[
-                                      (slice(ts, ts), (resolution), (0, 1), (0, 1), (1), (0, 1), (0, 1)), :]
-                    except KeyError:
-                        # No buy2 Signal, but buy1 signal
-                        pass
-                    else:  # BUY 2 signal detected
-                        check_buy_2 = check_buy_2_1.iloc[-1]
-                        #print('Buy2 signal was detected at', signal_index)
-                        signal = 'buy2'
-                        signals.append([check_buy_2.name, signal])
+                    if check_buy_1_1.shape[0] != 0:
+                        check_buy_1 = check_buy_1_1.iloc[-1]
+                        #print('376-Buy1 signal was detected at:', check_buy_1.name)
+                        signal = 'buy1'
+                        signals.append([check_buy_1.name, signal])
+                        try:
+                            # IS there a BUY 2 signal?
+                            ts = check_buy_1.name[0] # signal has to be in the same time and resolution
+                            check_buy_2_1 = self.df_data_all.loc[
+                                          (slice(ts, ts), (resolution), (0, 1), (0, 1), (1), (0, 1), (0, 1)), :]
+                        except KeyError:
+                            # No buy2 Signal, but buy1 signal
+                            pass
+                        else:  # BUY 2 signal detected
+                            if check_buy_2_1.shape[0] != 0:
+                                check_buy_2 = check_buy_2_1.iloc[-1]
+                                #print('Buy2 signal was detected at', signal_index)
+                                signal = 'buy2'
+                                signals.append([check_buy_2.name, signal])
             else:  # sell1 signal detected; there may be a sell2, since it is a sub-type of sell1
-                check_sell_1 = check_sell_1_1.iloc[-1]
-                signal = 'sell1'
-                signals.append([check_sell_1.name, signal])
-                try:  # Is there a SELL2 signal?
-                    ts = check_sell_1.name[0]  # signal has to be in the same time and resolution
-                    #print(f"#256. ts for signal_index[0] = {ts}")
-                    #print(f'#257 signal_index = {signal_index}')
-                    check_sell_2_1 = self.df_data_all.loc[
-                                     (slice(ts, ts), (resolution), (0, 1), (0, 1), (0, 1), (1), (0, 1)), :]
-                except KeyError:
-                    # No sell2 signal, but sell1 signal
-                    pass
-                else:
-                    # sell2 signal
-                    check_sell_2 = check_sell_2_1.iloc[-1]
-                    signal = 'sell2'
-                    signals.append([check_sell_2.name, signal])
+                print(f'401-check_sell_1_1:\n{check_sell_1_1}')
+                if check_sell_1_1.shape[0] != 0:
+                    check_sell_1 = check_sell_1_1.iloc[-1]
+                    signal = 'sell1'
+                    signals.append([check_sell_1.name, signal])
+                    try:  # Is there a SELL2 signal?
+                        ts = check_sell_1.name[0]  # signal has to be in the same time and resolution
+                        #print(f"#256. ts for signal_index[0] = {ts}")
+                        #print(f'#257 signal_index = {signal_index}')
+                        check_sell_2_1 = self.df_data_all.loc[
+                                         (slice(ts, ts), (resolution), (0, 1), (0, 1), (0, 1), (1), (0, 1)), :]
+                    except KeyError:
+                        # No sell2 signal, but sell1 signal
+                        pass
+                    else:
+                        # sell2 signal
+                        check_sell_2 = check_sell_2_1.iloc[-1]
+                        signal = 'sell2'
+                        signals.append([check_sell_2.name, signal])
             # End of signal detection
             # Are there type 1 and type 2 signals of the same index? Keep type 2 only
             #print(f'signals list before:\n {signals})')
@@ -552,7 +563,6 @@ class Analysis(object):
             #print(f'496-Num signals: {num_signals}, wait signals: {wait_signals}')
             return num_signals, wait_signals  # num_signals helps avoid df slicing in subsequent steps
 
-
         def check_signal_validity(signal_index, resolution):
             print(f'501- check_signal_validity({resolution})')
             print(f'502- Validating Signal_index: {signal_index} at (Time: {idx[0], idx[1]})')
@@ -629,6 +639,10 @@ class Analysis(object):
                 if change_counter < 2:
                     # Diagram decision 2: Did the candle close inside upper1 and lower1
                     if self.df_data_all.loc[last_row, 'upper1'] > self.df_data_all.loc[last_row, 'c'] > self.df_data_all.loc[last_row, 'lower1']:
+                        print(f'560-Signal is valid with: upper1 > close > lower1')
+                        print('upper1:', self.df_data_all.loc[last_row, 'upper1'])
+                        print('close:', self.df_data_all.loc[last_row, 'c'])
+                        print('lower1:', self.df_data_all.loc[last_row, 'lower1'])
                         # Diagram outcome 3
                         signal_state_1 = 1 # 'valid')
                     else:  # This line is not needed???????
@@ -711,7 +725,7 @@ class Analysis(object):
             secondary_signals_complete = None
             valid_signal = None
 
-            #print(f'================Analyzing({idx} @{resolution} resolution')
+            print(f'723================Analyzing({idx} @{resolution} resolution')
             # indicates that an analysis was conducted, even if no valid signals are returned
             # when analysis_conduct == True, selected_valid_signal is None, signals_complete == True
             # then stoploss_check() can run
@@ -816,6 +830,7 @@ class Analysis(object):
                             elif sub_signal_status == 0:  # 'wait':
                                 # Wait @ secondary resolution
                                 self.use_smaller_resolution = True
+                                print(f'755-Use_smaller is now {self.use_smaller_resolution}')
                             elif sub_signal_status == 3:  # 'invalid':
                                 #print(f'706-sub_signal is {sub_signal_index}')
                                 self.change_signal_state(sub_signal_index, 3)
@@ -1000,9 +1015,12 @@ class Analysis(object):
         # ==============================section=====================================
         # Future version note: This decision is not needed if analysis @1m returns (selected_valid_signal = None)?????
         # Decides whether to process a transaction or not before a stoploss_check()
-        if resolution == self.RESOLUTIONS[-1] and mins % second_res != second_res-1:
+        if resolution == self.RESOLUTIONS[-1] and mins % second_res != second_res-1 and mins % second_res != 0:
             # run stoploss_check() will decide if it needs to run
             # sending idx with no signal will run stoploss_check()
+            print(f'1016-Not analyzed: {idx}')
+            print('mins % second_res', mins % second_res)
+            print('second_res-1', second_res-1)
             self.check_transaction_execution(idx)
             pass
         else:
@@ -1090,7 +1108,7 @@ class Analysis(object):
                 close_delta = self.PRIMARY_RESOLUTION - self.SECONDARY_RESOLUTION
 
             close_time = timestamp + timedelta(minutes=close_delta)
-            #print(f'close_time = {close_time}')
+            print(f'1097-close_time = {close_time}')
             execution_candle = self.df_data_all.loc[
                                      (slice(close_time), self.SECONDARY_RESOLUTION, (0, 1), (0, 1), (0, 1), (0, 1), (0, 1)), :]
             #execution_candle = self.df_data_all.loc[execution_candle_index]
@@ -1262,19 +1280,20 @@ class Analysis(object):
                 elif last_transaction_res == 15:
                     start = last_transaction_time  # + timedelta(minutes=14)
 
-                #print(f'========all_data=========\n{self.df_data_all.iloc[-20:]}')
+                #print(f'1268========all_data=========\n{self.df_data_all.iloc[-20:]}')
                 #print('=============all_data shape===============', self.df_data_all.shape[0])
                 try:
                     # slice to find data with the timestamp, resolution
                     data_df_slice = self.df_data_all.loc[
-                                     (slice(start, end), (1), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1)), :]
+                                     (slice(start, end), (self.RESOLUTIONS[-1]), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1)), :]
                 except IndexError:
                     raise IndexError  # No data of the timestamp, there should be data!!!!
                 else:
                     # There is data, retrieve the price close
-                    #print('1159-slice index: ',data_df_slice)
+                    # print('1159-slice index: ',data_df_slice)
                     slice_key = data_df_slice.index[-1]
-                    #print(f'checking stoploss @1m with df_data_all slice:\n{slice_key}\n=================')
+                    print(f'1296-checking stoploss @1m with df_data_all slice:\n{slice_key}\n=================')
+                    print(data_df_slice)
                     close = data_df_slice.at[slice_key, 'c']
                     if transaction == "buy":
                         if close < last_price - (limit * 2000000):  # limi*2. Set a high number to disable

@@ -45,17 +45,21 @@ class Analysis(object):
         self.date_time = datetime.now()
         self.time = self.date_time.strftime("%Y_%m_%d-%H-%M-%S")
         self.date_for_file = self.date_time.strftime("%Y_%m_%d")
-        self.ticker_path = 'C:/Users/jocox/Dropbox/Trading/James/csv/ticker'
-        self.df_data_all_path = 'C:/Users/jocox/Dropbox/Trading/James/csv/data_all'
+        self.spectre_dropBox_path = 'C:/Users/james/Dropbox'
+        self.ollu_dropBox_path = 'C:/Users/jocox/Dropbox'
+        self.envy_dropBox_path = 'D:/Dropbox'
+        self.dropBox_path = self.spectre_dropBox_path
+        self.ticker_path = self.dropBox_path + '/Trading/James/csv/ticker'
+        self.df_data_all_path = self.dropBox_path + '/Trading/James/csv/data_all'
 
         # trade signal variables:
         self.RSI_OVERBOUGHT = 64
         self.RSI_OVERSOLD = 33
 
         # time resolution that the algorithm is working with
-        self.RESOLUTIONS = [45, 15]  # time resolutions available for teh algo to use
-        self.PRIMARY_RESOLUTION = 45  # default working resolution
-        self.SECONDARY_RESOLUTION = 15
+        self.RESOLUTIONS = [5, 1]  # time resolutions available for teh algo to use
+        self.PRIMARY_RESOLUTION = 5  # default working resolution
+        self.SECONDARY_RESOLUTION = 1
         self.use_smaller_resolution = False
 
         # Signals Data Frame stores signals and their state.

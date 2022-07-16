@@ -14,8 +14,10 @@ from kucoin.web_socket.web_socket import WebSocket
 # Analysis object must be initialized first> It needs to be persistent. It will contain the live df's)
 analysis = Analysis() #=========================================================================================================
 # reader = read_historical_data.read_historical_data(analysis)
-t = Thread(target=read_historical_data.read_historical_data(analysis))
-t.start()
+read_historical = False
+if read_historical:
+    t = Thread(target=read_historical_data.read_historical_data(analysis))
+    t.start()
 
 
 logger = logging.getLogger()

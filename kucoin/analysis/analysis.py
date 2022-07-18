@@ -1224,6 +1224,7 @@ class Analysis(object):
 
             print(f'1086-use smaller resolution is {self.use_smaller_resolution}\n================================')
 
+
             # check that there are no valid or waiting signals previous to the executed one
             start = self.df_signals.iloc[0].name[0]  # series.name[0] should result in timestamp
             end = self.df_signals.iloc[-1].name[0]

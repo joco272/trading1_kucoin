@@ -71,7 +71,7 @@ if __name__ == '__main__':
         return
 
 
-    def place_order(self):
+    def place_order(self):  # market (spot), no margin
         # Methods for this in TradeData
         return
 

@@ -210,7 +210,7 @@ class Analysis(object):
         # self.df_data_all.to_csv(csv_data_all, index=True, mode='a', header=False)
         # ===================================Start new Merge method======================================
 
-        # df = df.set_index(['time', 'timeline', 'b1', 's1', 'b2', 's2', 'nt'])
+        df = df.set_index(['time', 'timeline', 'b1', 's1', 'b2', 's2', 'nt'])
         # print('===========df to append========\n', df)
         # print(f'DF from reader to append is {df}')
         self.df_data_all = self.df_data_all.append(df)
@@ -1089,7 +1089,7 @@ class Analysis(object):
                 proposed_transaction = self.df_signals.loc[selected_valid_signal][0][:-1]
 
 
-        # executes a regular trade or a correction transaction
+        # executes a regular trade or a correction (stoploss )transaction
         # Finished 02/19/22 1628
         def execute_transaction(transaction_execution, stoploss):
             #print('954========execute transaction is called====================')
@@ -1176,6 +1176,7 @@ class Analysis(object):
 
 
         # Finished 02/20/22 1512
+        # Function processes a regular or stoploss transaction
         def finalize_transaction(dict_to_append, stoploss):
             print('1042-Paper Trade')
             print(f'1043-Proposed transaction: {proposed_transaction}. Next transaction: {next_transaction}')
@@ -1196,7 +1197,6 @@ class Analysis(object):
 
             print(f'1059-{proposed_transaction} ETH at {c}. Ending Balance of {new_balance} {new_currency}. Stoploss: {stoploss}')
 
-
             # transaction information to record
             self.last_transaction = proposed_transaction
             self.paper_balance_currency = new_currency
@@ -1216,7 +1216,7 @@ class Analysis(object):
                 df_append.to_csv(csv_data, index=True, mode='a', header=True)
 
             # update self.df_signals here:
-            if selected_valid_signal is not None:  # It will be None in the case of a stoploss
+            if selected_valid_signal is not None:  # It will be None in the case of a stoploss, regular transaction
                 signal_idx = selected_valid_signal
                 self.change_signal_state(signal_idx, 2)  # executed
                 print(f'1085- Signal {signal_idx} has been changed to state: 2')

@@ -6,12 +6,19 @@ from threading import Thread
 from kucoin.clients.kuCoin_client import KuCoinSpotClient as Client
 from kucoin.web_hooks_processor.web_hooks_processor import WebHookProcessor
 
+spectre_dropBox_path = 'C:/Users/james/Dropbox'
+ollu_dropBox_path = 'C:/Users/jocox/Dropbox'
+envy_dropBox_path = 'D:/Dropbox'
+
+envy_IP = '192.168.0.118'
+spectre_IP = '192.168.0.250'
+
 app = Flask('hooks')
-dataOpenOutPath = 'D:/Dropbox/Trading/James/incomingHooks/open/'
-dataCloseOutPath = 'D:/Dropbox/Trading/James/incomingHooks/close/'
-tradeOutPath = 'D:/Dropbox/Trading/James/incomingHooks/trades/'
-dataOutPath = 'D:/Dropbox/Trading/James/incomingHooks/data/'
-actionOutPath = 'D:/Dropbox/Trading/James/incomingHooks/action/'
+dataOpenOutPath = spectre_dropBox_path+ '/Trading/James/incomingHooks/open/'
+dataCloseOutPath = spectre_dropBox_path+ '/Trading/James/incomingHooks/close/'
+tradeOutPath = spectre_dropBox_path+ '/Trading/James/incomingHooks/trades/'
+dataOutPath = spectre_dropBox_path+ '/Trading/James/incomingHooks/data/'
+actionOutPath = spectre_dropBox_path+ '/Trading/James/incomingHooks/action/'
 
 analysis = None
 
@@ -185,7 +192,7 @@ def run_flsk(analysis_ob):
     global analysis
     analysis = analysis_ob
     sleep(1)
-    app.run(host='192.168.0.118', port=80)
+    app.run(host=spectre_IP, port=80)
     print('FLASK IS RUNNING!!!!!')
     return
 

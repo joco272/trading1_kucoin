@@ -33429,3 +33429,81 @@ FileNotFoundError: [Errno 2] No such file or directory: 'D:/Dropbox/Trading/Jame
 2022-07-16 14:45:09,072 ERROR :: KuCoin Web Socket connection error: [WinError 10054] An existing connection was forcibly closed by the remote host at 14:45:09
 2022-07-16 14:45:09,074 WARNING :: KuCoin Web Socket connection has closed.
 2022-07-16 14:45:09,075 WARNING :: KuCoin Web Socket connection has closed.
+2022-07-16 15:08:42,388 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-07-16 15:08:42,389 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-07-16 15:08:42,656 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-07-16 15:08:43,105 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-07-16 15:08:43,322 INFO :: Kucoin Web Socket connection opened.
+2022-07-16 15:08:43,717 INFO :: Kucoin Web Socket connection opened.
+2022-07-16 15:25:21,880 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:26:12,059 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:26:15,158 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:26:15,656 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:26:31,584 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:27:15,659 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:27:56,373 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:27:58,363 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:28:02,664 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:29:15,967 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:29:25,565 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:30:02,164 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:30:03,554 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:32:00,059 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:32:03,162 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:38:09,057 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:38:44,661 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:39:31,757 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:40:01,556 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:40:02,962 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:40:06,758 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:40:14,062 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:40:15,062 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:40:15,663 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:40:43,068 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:41:15,664 ERROR :: error from callback <bound method WebSocket.on_message of <kucoin.web_socket.web_socket.WebSocket object at 0x000002653E5E8550>>: [Errno 13] Permission denied: 'C:/Users/james/Dropbox/Trading/James/csv/ticker/2022_07_16_ticker.csv'
+2022-07-16 15:56:55,708 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-07-16 15:56:55,709 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-07-16 15:56:56,005 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-07-16 15:56:56,073 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-07-16 15:56:56,674 INFO :: Kucoin Web Socket connection opened.
+2022-07-16 15:56:56,690 INFO :: Kucoin Web Socket connection opened.
+2022-07-16 15:56:56,706 INFO ::  * Running on http://192.168.0.120:80 (Press CTRL+C to quit)
+2022-07-16 15:58:28,830 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-07-16 15:58:28,831 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-07-16 15:58:29,094 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-07-16 15:58:29,094 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-07-16 15:58:29,769 INFO :: Kucoin Web Socket connection opened.
+2022-07-16 15:58:29,785 INFO :: Kucoin Web Socket connection opened.
+2022-07-16 16:00:56,393 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-07-16 16:00:56,393 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-07-16 16:00:56,675 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-07-16 16:00:56,675 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-07-16 16:00:57,369 INFO :: Kucoin Web Socket connection opened.
+2022-07-16 16:00:57,384 INFO :: Kucoin Web Socket connection opened.
+2022-07-16 16:00:57,401 INFO ::  * Running on http://192.168.0.120:80 (Press CTRL+C to quit)
+2022-07-16 16:02:21,567 ERROR :: KuCoin Web Socket connection error: ping/pong timed out at 16:02:21
+2022-07-16 16:02:24,081 ERROR :: KuCoin Web Socket connection error: ping/pong timed out at 16:02:24
+2022-07-16 16:02:24,575 WARNING :: KuCoin Web Socket connection has closed.
+2022-07-16 16:02:27,096 WARNING :: KuCoin Web Socket connection has closed.
+2022-07-16 16:05:21,675 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-07-16 16:05:21,675 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-07-16 16:05:21,963 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-07-16 16:05:21,963 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-07-16 16:05:22,648 INFO :: Kucoin Web Socket connection opened.
+2022-07-16 16:05:22,667 INFO :: Kucoin Web Socket connection opened.
+2022-07-16 16:05:40,929 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-07-16 16:05:40,929 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-07-16 16:05:41,170 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-07-16 16:05:41,170 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-07-16 16:05:41,792 INFO :: Kucoin Web Socket connection opened.
+2022-07-16 16:05:41,792 INFO :: Kucoin Web Socket connection opened.
+2022-07-16 16:05:41,935 INFO ::  * Running on http://192.168.0.250:80 (Press CTRL+C to quit)
+2022-07-16 16:06:00,934 INFO :: 34.212.75.30 - - [16/Jul/2022 16:06:00] "POST /dt HTTP/1.1" 200 -
+2022-07-16 16:06:57,820 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-07-16 16:06:57,820 DEBUG :: Starting new HTTPS connection (1): api.kucoin.com:443
+2022-07-16 16:06:58,065 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-07-16 16:06:58,065 DEBUG :: https://api.kucoin.com:443 "POST /api/v1/bullet-public HTTP/1.1" 200 None
+2022-07-16 16:06:58,743 INFO :: Kucoin Web Socket connection opened.
+2022-07-16 16:06:58,746 INFO :: Kucoin Web Socket connection opened.
+2022-07-16 16:06:58,825 INFO ::  * Running on http://192.168.0.250:80 (Press CTRL+C to quit)
+2022-07-16 16:07:01,908 INFO :: 52.32.178.7 - - [16/Jul/2022 16:07:01] "POST /dt HTTP/1.1" 200 -
